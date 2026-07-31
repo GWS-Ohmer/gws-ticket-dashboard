@@ -215,6 +215,8 @@
     .fbtn.on.l1c           { background: var(--l1);     border-color: var(--l1); }
     .fbtn.on.l2c           { background: var(--l2);     border-color: var(--l2); }
     .fbtn.on.l3c           { background: var(--l3);     border-color: var(--l3); }
+    .fbtn.on.l-manual      { background: linear-gradient(90deg, var(--l1), var(--l2), var(--l3));
+                             border-color: var(--l2); color: #fff; }
 
     .fdivider { width: 1px; height: 26px; background: var(--border); flex-shrink: 0; }
 
@@ -405,7 +407,7 @@ const F = {             // active filters
   dateFrom:    "",
   dateTo:      "",
   statusGroup: "all",   // "all" | "g1" | "g2"
-  level:       "all",   // "all" | "L0" | "L1" | "L2" | "L3"
+  levels:      new Set(), // empty = All; otherwise contains "L0","L1","L2","L3"
   search:      "",
 };
 
@@ -481,7 +483,7 @@ function applyFilters() {
     }
     if (F.statusGroup === "g1" && !isDone(t.status)) return false;
     if (F.statusGroup === "g2" &&  isDone(t.status)) return false;
-    if (F.level !== "all" && t.level !== F.level)    return false;
+    if (F.levels.size > 0 && !F.levels.has(t.level)) return false;
     if (F.search) {
       const q = F.search.toLowerCase();
       if (!t.key.toLowerCase().includes(q) &&
@@ -610,7 +612,18 @@ function btn(label, group, val, extraCls="") {
   return `<button class="fbtn${on?" on"+(extraCls?" "+extraCls:""):""}" data-g="${group}" data-v="${val}">${label}</button>`;
 }
 
+// Multi-select level button — highlighted if in the active set
+function lvlBtn(label, level, colorCls) {
+  const on = F.levels.has(level);
+  return `<button class="fbtn${on?" on "+colorCls:""}" data-lvl="${level}">${label}</button>`;
+}
+
 function renderFilters() {
+  const allOn = F.levels.size === 0;
+  // Label showing selected levels as shorthand
+  const manualOn  = ["L1","L2","L3"].every(l => F.levels.has(l));
+  const selCount  = F.levels.size;
+
   return `
   <div class="filters">
     <span class="fl">📅 From</span>
@@ -628,13 +641,16 @@ function renderFilters() {
     <div class="fdivider"></div>
 
     <span class="fl">Level</span>
-    <div class="btn-grp">
-      ${btn("All",      "level","all")}
-      ${btn("🤖 L0",   "level","L0","l0c")}
-      ${btn("L1",       "level","L1","l1c")}
-      ${btn("L2",       "level","L2","l2c")}
-      ${btn("L3",       "level","L3","l3c")}
+    <div class="btn-grp" id="lvl-grp">
+      <button class="fbtn${allOn?" on":""}" id="lvl-all">All</button>
+      ${lvlBtn("🤖 L0","L0","l0c")}
+      ${lvlBtn("L1","L1","l1c")}
+      ${lvlBtn("L2","L2","l2c")}
+      ${lvlBtn("L3","L3","l3c")}
+      <button class="fbtn${manualOn?" on l-manual":""}" id="lvl-manual"
+        title="Select all Manual levels (L1 + L2 + L3)">🧑 Manual</button>
     </div>
+    ${selCount > 0 ? `<span style="font-size:11px;color:var(--muted);white-space:nowrap">${selCount} level${selCount>1?"s":""} selected</span>` : ""}
     <div class="fdivider"></div>
 
     <input type="text" class="fi fsearch" id="fsearch"
@@ -731,11 +747,33 @@ function renderPager(total) {
 let searchTimer;
 
 document.getElementById("app").addEventListener("click", e => {
-  // filter toggle buttons
-  const fb = e.target.closest(".fbtn");
+
+  // ── Level multi-select ───────────────────────────────────────────────────
+  if (e.target.closest("#lvl-all")) {
+    F.levels.clear();                          // All = no filter
+    applyFilters(); renderApp(); return;
+  }
+  if (e.target.closest("#lvl-manual")) {
+    // Toggle "Manual" shortcut = L1+L2+L3
+    const manualSet = ["L1","L2","L3"];
+    const allOn = manualSet.every(l => F.levels.has(l));
+    if (allOn) { manualSet.forEach(l => F.levels.delete(l)); }
+    else       { manualSet.forEach(l => F.levels.add(l)); }
+    applyFilters(); renderApp(); return;
+  }
+  const lvlBtn = e.target.closest("[data-lvl]");
+  if (lvlBtn) {
+    const lv = lvlBtn.dataset.lvl;
+    if (F.levels.has(lv)) F.levels.delete(lv);  // toggle off
+    else                  F.levels.add(lv);      // toggle on
+    applyFilters(); renderApp(); return;
+  }
+
+  // ── Status filter toggle buttons ─────────────────────────────────────────
+  const fb = e.target.closest(".fbtn[data-g]");
   if (fb) { F[fb.dataset.g] = fb.dataset.v; applyFilters(); renderApp(); return; }
 
-  // sortable header
+  // ── Sortable header ───────────────────────────────────────────────────────
   const colTh = e.target.closest("th[data-col]");
   if (colTh) {
     const col = colTh.dataset.col;
@@ -744,7 +782,7 @@ document.getElementById("app").addEventListener("click", e => {
     applyFilters(); renderApp(); return;
   }
 
-  // pagination buttons
+  // ── Pagination ────────────────────────────────────────────────────────────
   const pp = e.target.closest("[data-p]");
   if (pp) { page = +pp.dataset.p; renderApp(); return; }
 
