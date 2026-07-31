@@ -1,9 +1,29 @@
 {
-  "fetched_at": "2026-07-31T20:39:31.183576+00:00",
+  "fetched_at": "2026-07-31T21:10:14.487276+00:00",
   "year": 2026,
   "jql": "project = \"ITH\" AND component = \"Google\" AND created >= \"2026-01-01\" ORDER BY created DESC",
-  "total_fetched": 1839,
+  "total_fetched": 1840,
   "tickets": [
+    {
+      "key": "ITH-262954",
+      "url": "https://hellofresh.atlassian.net/browse/ITH-262954",
+      "summary": "Urgent Request for Distro list",
+      "status": "Open L2 GWS Support",
+      "status_category_key": "new",
+      "level": "L2",
+      "is_automated": false,
+      "assignee_name": "Unassigned",
+      "assignee_email": "",
+      "reporter_name": "Kristin Haar",
+      "created": "2026-07-31T22:33:32.379+0200",
+      "updated": "2026-07-31T23:05:12.592+0200",
+      "resolutiondate": null,
+      "priority": "High",
+      "issuetype": "Service Request",
+      "resolution": null,
+      "request_type": "General IT Request",
+      "request_type_id": "882"
+    },
     {
       "key": "ITH-262923",
       "url": "https://hellofresh.atlassian.net/browse/ITH-262923",
