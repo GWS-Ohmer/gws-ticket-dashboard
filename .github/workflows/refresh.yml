@@ -1,0 +1,42 @@
+name: Refresh Ticket Data
+
+on:
+  schedule:
+    # Every 15 minutes — GitHub Actions minimum granularity
+    - cron: "*/15 * * * *"
+  workflow_dispatch:   # allow manual trigger from the Actions tab
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write   # needed to commit tickets.json back to main
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Fetch tickets from Jira
+        env:
+          JIRA_EMAIL:    ${{ secrets.JIRA_EMAIL }}
+          JIRA_TOKEN:    ${{ secrets.JIRA_TOKEN }}
+          JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
+        run: python fetch_tickets.py
+
+      - name: Commit & push tickets.json
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add tickets.json
+          # only commit when the file actually changed
+          git diff --staged --quiet || \
+            git commit -m "chore: refresh tickets [$(date -u '+%Y-%m-%d %H:%M UTC')]"
+          git push

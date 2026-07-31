@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GWS Ticket Dashboard</title>
+  <style>
+    /* ── reset & tokens ──────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0d1117;
+      --surface:   #161b22;
+      --surface2:  #1e2430;
+      --border:    #272f3f;
+      --text:      #e6edf3;
+      --muted:     #7d8590;
+      --accent:    #4f8ef7;
+
+      --l0: #a78bfa; /* automated – violet */
+      --l1: #38bdf8; /* blue  */
+      --l2: #fb923c; /* orange */
+      --l3: #f87171; /* red   */
+
+      --green:  #3ecf8e;
+      --orange: #fb923c;
+      --red:    #f87171;
+
+      /* status bar palette */
+      --bar0: #3ecf8e;
+      --bar1: #4f8ef7;
+      --bar2: #a78bfa;
+      --bar3: #fb923c;
+      --bar4: #f87171;
+      --bar5: #38bdf8;
+      --bar6: #facc15;
+      --bar7: #34d399;
+      --bar8: #c084fc;
+      --bar9: #fb7185;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── header ──────────────────────────────────────────────────────────── */
+    .header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 18px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .header-brand { display: flex; align-items: center; gap: 12px; }
+    .header-icon {
+      width: 42px; height: 42px;
+      background: linear-gradient(135deg, #4285f4 0%, #34a853 100%);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; flex-shrink: 0;
+    }
+    .header-title { font-size: 18px; font-weight: 700; letter-spacing: -0.3px; }
+    .header-sub   { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .refresh-pill {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 5px 14px;
+      font-size: 12px; color: var(--muted);
+      flex-shrink: 0;
+    }
+    .live-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%; background: var(--green);
+      animation: blink 2s ease-in-out infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+    /* ── layout ──────────────────────────────────────────────────────────── */
+    .main { padding: 22px 28px; max-width: 1680px; margin: 0 auto; }
+
+    /* ── KPI cards ───────────────────────────────────────────────────────── */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+    .kpi {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px 20px;
+      position: relative; overflow: hidden;
+    }
+    .kpi::after {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      border-radius: 12px 12px 0 0;
+    }
+    .kpi.total::after    { background: var(--accent); }
+    .kpi.auto::after     { background: var(--l0); }
+    .kpi.manual::after   { background: var(--l2); }
+    .kpi.done::after     { background: var(--green); }
+
+    .kpi-label { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .7px; margin-bottom: 8px; }
+    .kpi-value { font-size: 38px; font-weight: 800; line-height: 1; margin-bottom: 5px; }
+    .kpi.total  .kpi-value { color: var(--accent); }
+    .kpi.auto   .kpi-value { color: var(--l0); }
+    .kpi.manual .kpi-value { color: var(--l2); }
+    .kpi.done   .kpi-value { color: var(--green); }
+    .kpi-hint { font-size: 12px; color: var(--muted); }
+
+    /* ── status panels ───────────────────────────────────────────────────── */
+    .panels {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px 20px;
+    }
+    .panel-head {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 16px;
+    }
+    .panel-emoji { font-size: 22px; }
+    .panel-name  { font-size: 14px; font-weight: 600; }
+    .panel-desc  { font-size: 11px; color: var(--muted); margin-top: 1px; }
+    .panel-total {
+      margin-left: auto;
+      font-size: 28px; font-weight: 700;
+    }
+    .panel-auto   .panel-total { color: var(--l0); }
+    .panel-manual .panel-total { color: var(--l2); }
+
+    .status-group-label {
+      font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .8px;
+      padding: 8px 0 5px;
+      margin-bottom: 4px;
+      border-bottom: 1px solid var(--border);
+    }
+    .status-group-label.g1 { color: var(--green); }
+    .status-group-label.g2 { color: var(--orange); }
+
+    .srow {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 7px;
+    }
+    .srow-name {
+      font-size: 12px; color: var(--muted);
+      width: 170px; flex-shrink: 0;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .srow-track {
+      flex: 1; height: 5px;
+      background: var(--surface2); border-radius: 3px; overflow: hidden;
+    }
+    .srow-fill { height: 100%; border-radius: 3px; transition: width .4s ease; }
+    .srow-n {
+      font-size: 12px; font-weight: 600; color: var(--text);
+      min-width: 28px; text-align: right;
+    }
+
+    /* ── filters ─────────────────────────────────────────────────────────── */
+    .filters {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin-bottom: 18px;
+      display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    }
+    .fl { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .6px; white-space: nowrap; }
+    .fi {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      padding: 6px 10px;
+      font-size: 13px; outline: none;
+      transition: border-color .15s;
+    }
+    .fi:focus { border-color: var(--accent); }
+    input[type="date"].fi { color-scheme: dark; }
+
+    .btn-grp { display: flex; gap: 4px; }
+    .fbtn {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--muted);
+      padding: 5px 12px;
+      font-size: 12px; font-weight: 500;
+      cursor: pointer;
+      transition: all .12s;
+      white-space: nowrap;
+    }
+    .fbtn:hover            { border-color: var(--accent); color: var(--text); }
+    .fbtn.on               { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .fbtn.on.g1            { background: var(--green);  border-color: var(--green); }
+    .fbtn.on.g2            { background: var(--orange); border-color: var(--orange); }
+    .fbtn.on.l0c           { background: var(--l0);     border-color: var(--l0); }
+    .fbtn.on.l1c           { background: var(--l1);     border-color: var(--l1); }
+    .fbtn.on.l2c           { background: var(--l2);     border-color: var(--l2); }
+    .fbtn.on.l3c           { background: var(--l3);     border-color: var(--l3); }
+
+    .fdivider { width: 1px; height: 26px; background: var(--border); flex-shrink: 0; }
+
+    .fsearch { flex: 1; min-width: 200px; }
+
+    /* ── table ───────────────────────────────────────────────────────────── */
+    .tcard {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .tbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 18px;
+      border-bottom: 1px solid var(--border);
+    }
+    .tbar-title { font-size: 14px; font-weight: 600; }
+    .tbar-count { font-size: 12px; color: var(--muted); }
+
+    .tscroll { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; }
+
+    thead th {
+      background: var(--surface2);
+      padding: 9px 14px;
+      text-align: left;
+      font-size: 11px; font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase; letter-spacing: .6px;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer; user-select: none;
+      white-space: nowrap;
+    }
+    thead th:hover { color: var(--text); }
+    thead th.active { color: var(--accent); }
+
+    tbody tr { border-bottom: 1px solid var(--border); transition: background .1s; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: var(--surface2); }
+
+    td {
+      padding: 9px 14px;
+      font-size: 13px; color: var(--text);
+      vertical-align: middle;
+    }
+
+    .tkey {
+      font-weight: 600; font-size: 12px;
+      color: var(--accent); text-decoration: none; white-space: nowrap;
+    }
+    .tkey:hover { text-decoration: underline; }
+
+    .tsum {
+      max-width: 360px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+
+    /* badges */
+    .badge {
+      display: inline-flex; align-items: center;
+      padding: 2px 8px; border-radius: 6px;
+      font-size: 11px; font-weight: 600; white-space: nowrap;
+    }
+    /* level */
+    .bl0 { background:rgba(167,139,250,.18); color:#c4b5fd; border:1px solid rgba(167,139,250,.35); }
+    .bl1 { background:rgba(56,189,248,.18);  color:#7dd3fc; border:1px solid rgba(56,189,248,.35); }
+    .bl2 { background:rgba(251,146,60,.18);  color:#fdba74; border:1px solid rgba(251,146,60,.35); }
+    .bl3 { background:rgba(248,113,113,.18); color:#fca5a5; border:1px solid rgba(248,113,113,.35); }
+    .bln { background:rgba(125,133,144,.15); color:#9ca3af; border:1px solid rgba(125,133,144,.3); }
+    /* status groups */
+    .bg1 { background:rgba(62,207,142,.12); color:#6ee7b7; border:1px solid rgba(62,207,142,.3); } /* done */
+    .bg2 { background:rgba(251,146,60,.12); color:#fdba74; border:1px solid rgba(251,146,60,.3); } /* ongoing */
+    /* priority */
+    .phigh   { background:rgba(248,113,113,.12); color:#fca5a5; }
+    .pnormal { background:rgba(251,191,36,.12);  color:#fde68a; }
+    .plow    { background:rgba(62,207,142,.12);  color:#6ee7b7; }
+
+    .dcell { font-size: 12px; color: var(--muted); white-space: nowrap; }
+
+    /* pagination */
+    .pager {
+      display: flex; align-items: center; justify-content: center;
+      gap: 5px; padding: 14px;
+      border-top: 1px solid var(--border);
+    }
+    .pbtn {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--muted);
+      padding: 5px 11px;
+      font-size: 13px; cursor: pointer;
+      transition: all .12s;
+    }
+    .pbtn:hover:not(:disabled) { border-color: var(--accent); color: var(--text); }
+    .pbtn.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .pbtn:disabled { opacity: .35; cursor: not-allowed; }
+    .pdots { font-size: 12px; color: var(--muted); padding: 0 4px; }
+
+    /* states */
+    .center-state {
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 80px 20px; gap: 10px; color: var(--muted);
+    }
+    .spinner {
+      width: 30px; height: 30px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* responsive */
+    @media (max-width: 1080px) {
+      .kpi-grid { grid-template-columns: 1fr 1fr; }
+      .panels   { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 600px) {
+      .main   { padding: 14px; }
+      .header { padding: 14px; }
+      .kpi-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── header ──────────────────────────────────────────────────────────────── -->
+<header class="header">
+  <div class="header-brand">
+    <div class="header-icon">🌐</div>
+    <div>
+      <div class="header-title">Google Workspace — IT Ticket Dashboard</div>
+      <div class="header-sub" id="hdr-sub">Loading…</div>
+    </div>
+  </div>
+  <div class="refresh-pill">
+    <div class="live-dot"></div>
+    <span id="hdr-refresh">Loading…</span>
+  </div>
+</header>
+
+<!-- ── app ─────────────────────────────────────────────────────────────────── -->
+<main class="main" id="app">
+  <div class="center-state">
+    <div class="spinner"></div>
+    <span>Loading ticket data…</span>
+  </div>
+</main>
+
+<script>
+"use strict";
+
+/* ── constants ──────────────────────────────────────────────────────────── */
+
+// Group 1  ─ Closed / finished / no more action
+const DONE_STATUSES = new Set([
+  "resolved", "closed", "cancelled", "done", "complete", "completed",
+  "won't fix", "wontfix", "duplicate", "not a bug", "auto-resolved",
+  "rejected", "withdrawn", "cancelled by user", "auto closed",
+]);
+
+const BAR_COLORS = [
+  "var(--bar0)","var(--bar1)","var(--bar2)","var(--bar3)","var(--bar4)",
+  "var(--bar5)","var(--bar6)","var(--bar7)","var(--bar8)","var(--bar9)",
+];
+
+const LEVEL_META = {
+  L0: { cls: "bl0", short: "🤖 L0", tip: "L0 — Automated" },
+  L1: { cls: "bl1", short: "L1",     tip: "L1 — Manual" },
+  L2: { cls: "bl2", short: "L2",     tip: "L2 — Manual" },
+  L3: { cls: "bl3", short: "L3",     tip: "L3 — Manual" },
+};
+
+const PAGE_SIZE = 50;
+
+/* ── state ──────────────────────────────────────────────────────────────── */
+
+let ALL       = [];     // full dataset (never mutated)
+let FILTERED  = [];     // after filters
+let sortCol   = "created";
+let sortDir   = "desc";
+let page      = 1;
+
+const F = {             // active filters
+  dateFrom:    "",
+  dateTo:      "",
+  statusGroup: "all",   // "all" | "g1" | "g2"
+  level:       "all",   // "all" | "L0" | "L1" | "L2" | "L3"
+  search:      "",
+};
+
+/* ── helpers ────────────────────────────────────────────────────────────── */
+
+const isDone = s => DONE_STATUSES.has((s || "").toLowerCase().trim());
+
+const esc = s =>
+  String(s || "")
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+
+function fmtDate(iso) {
+  if (!iso) return "—";
+  return new Date(iso).toLocaleDateString("en-GB", { day:"2-digit", month:"short", year:"numeric" });
+}
+function fmtDT(iso) {
+  if (!iso) return "—";
+  return new Date(iso).toLocaleString("en-GB",
+    { day:"2-digit", month:"short", year:"numeric", hour:"2-digit", minute:"2-digit" });
+}
+
+function levelMeta(lv) { return LEVEL_META[lv] || { cls:"bln", short: lv || "N/A", tip: lv || "Unknown" }; }
+
+function priorityCls(p) {
+  const l = (p||"").toLowerCase();
+  if (l.includes("high") || l.includes("urgent") || l.includes("critical")) return "phigh";
+  if (l.includes("low")  || l.includes("minor")  || l.includes("trivial"))  return "plow";
+  return "pnormal";
+}
+
+/* ── data load ──────────────────────────────────────────────────────────── */
+
+async function loadData() {
+  try {
+    const r    = await fetch("tickets.json?_=" + Date.now());
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    const data = await r.json();
+
+    ALL = data.tickets || [];
+
+    document.getElementById("hdr-sub").textContent =
+      `ITH Project · Google Workspace · ${data.year}`;
+    document.getElementById("hdr-refresh").textContent =
+      data.fetched_at ? "Refreshed " + fmtDT(data.fetched_at) : "Data loaded";
+
+    applyFilters();
+    renderApp();
+  } catch(e) {
+    document.getElementById("app").innerHTML = `
+      <div class="center-state">
+        <div style="font-size:40px">⚠️</div>
+        <div style="font-size:15px;color:var(--text)">Could not load ticket data</div>
+        <div style="font-size:12px">${esc(e.message)}</div>
+        <div style="font-size:11px;color:var(--muted);max-width:400px;text-align:center;margin-top:6px">
+          Make sure the GitHub Actions fetch job has run at least once and
+          <code>tickets.json</code> exists in the repository root.
+        </div>
+      </div>`;
+  }
+}
+
+/* ── filter + sort ──────────────────────────────────────────────────────── */
+
+function applyFilters() {
+  FILTERED = ALL.filter(t => {
+    if (F.dateFrom) {
+      if (new Date(t.created) < new Date(F.dateFrom)) return false;
+    }
+    if (F.dateTo) {
+      const cap = new Date(F.dateTo); cap.setDate(cap.getDate() + 1);
+      if (new Date(t.created) >= cap) return false;
+    }
+    if (F.statusGroup === "g1" && !isDone(t.status)) return false;
+    if (F.statusGroup === "g2" &&  isDone(t.status)) return false;
+    if (F.level !== "all" && t.level !== F.level)    return false;
+    if (F.search) {
+      const q = F.search.toLowerCase();
+      if (!t.key.toLowerCase().includes(q) &&
+          !t.summary.toLowerCase().includes(q) &&
+          !(t.assignee_name||"").toLowerCase().includes(q)) return false;
+    }
+    return true;
+  });
+
+  FILTERED.sort((a, b) => {
+    let av = a[sortCol] || "", bv = b[sortCol] || "";
+    if (sortCol === "created" || sortCol === "updated") {
+      av = +new Date(av); bv = +new Date(bv);
+    } else {
+      av = String(av).toLowerCase(); bv = String(bv).toLowerCase();
+    }
+    return (av < bv ? -1 : av > bv ? 1 : 0) * (sortDir === "asc" ? 1 : -1);
+  });
+
+  page = 1;
+}
+
+/* ── stats ──────────────────────────────────────────────────────────────── */
+
+function stats(arr) {
+  const auto   = arr.filter(t => t.level === "L0");
+  const manual = arr.filter(t => t.level !== "L0");
+  const count  = m => { const o={}; m.forEach(t => { o[t.status]=(o[t.status]||0)+1; }); return o; };
+  return {
+    total:   arr.length,
+    auto:    auto.length,
+    manual:  manual.length,
+    done:    arr.filter(t => isDone(t.status)).length,
+    autoMap:   count(auto),
+    manualMap: count(manual),
+  };
+}
+
+/* ── render ─────────────────────────────────────────────────────────────── */
+
+function renderApp() {
+  const s = stats(ALL);
+  document.getElementById("app").innerHTML =
+    renderKPI(s) + renderPanels(s) + renderFilters() + renderTable();
+}
+
+/* KPIs */
+function renderKPI(s) {
+  const pct = n => s.total ? Math.round(n / s.total * 100) : 0;
+  return `
+  <div class="kpi-grid">
+    <div class="kpi total">
+      <div class="kpi-label">📊 Total GWS Tickets (${new Date().getFullYear()})</div>
+      <div class="kpi-value">${s.total.toLocaleString()}</div>
+      <div class="kpi-hint">ITH · component: Google</div>
+    </div>
+    <div class="kpi auto">
+      <div class="kpi-label">🤖 Automated — L0</div>
+      <div class="kpi-value">${s.auto.toLocaleString()}</div>
+      <div class="kpi-hint">${pct(s.auto)}% of total · handled by IT Bot</div>
+    </div>
+    <div class="kpi manual">
+      <div class="kpi-label">🧑 Manual — L1 / L2 / L3</div>
+      <div class="kpi-value">${s.manual.toLocaleString()}</div>
+      <div class="kpi-hint">${pct(s.manual)}% of total · human-handled</div>
+    </div>
+    <div class="kpi done">
+      <div class="kpi-label">✅ Group 1 — Done / Closed</div>
+      <div class="kpi-value">${s.done.toLocaleString()}</div>
+      <div class="kpi-hint">${pct(s.done)}% completion rate</div>
+    </div>
+  </div>`;
+}
+
+/* Status panels */
+function renderStatusList(map) {
+  const entries = Object.entries(map).sort((a,b) => b[1]-a[1]);
+  const total   = entries.reduce((s,[,c]) => s+c, 0);
+  if (!entries.length) return '<div style="color:var(--muted);font-size:12px;padding:6px 0">No tickets</div>';
+
+  const g1 = entries.filter(([s]) =>  isDone(s));
+  const g2 = entries.filter(([s]) => !isDone(s));
+
+  const rows = (items, offset) => items.map(([name, cnt], i) => {
+    const pct   = total ? (cnt / total * 100).toFixed(1) : 0;
+    const color = BAR_COLORS[(offset + i) % BAR_COLORS.length];
+    return `
+      <div class="srow">
+        <div class="srow-name" title="${esc(name)}">${esc(name)}</div>
+        <div class="srow-track"><div class="srow-fill" style="width:${pct}%;background:${color}"></div></div>
+        <div class="srow-n">${cnt}</div>
+      </div>`;
+  }).join("");
+
+  return `
+    ${g2.length ? `<div class="status-group-label g2">⏳ Group 2 — Ongoing</div>${rows(g2, 0)}` : ""}
+    ${g1.length ? `<div class="status-group-label g1">✅ Group 1 — Done / Closed</div>${rows(g1, g2.length)}` : ""}
+  `;
+}
+
+function renderPanels(s) {
+  return `
+  <div class="panels">
+    <div class="panel panel-auto">
+      <div class="panel-head">
+        <span class="panel-emoji">🤖</span>
+        <div><div class="panel-name">Automated — L0</div><div class="panel-desc" style="color:var(--muted);font-size:11px">IT Bot · zero human touch</div></div>
+        <div class="panel-total">${s.auto}</div>
+      </div>
+      ${renderStatusList(s.autoMap)}
+    </div>
+    <div class="panel panel-manual">
+      <div class="panel-head">
+        <span class="panel-emoji">🧑</span>
+        <div><div class="panel-name">Manual — L1 / L2 / L3</div><div class="panel-desc" style="color:var(--muted);font-size:11px">Human-handled tickets</div></div>
+        <div class="panel-total">${s.manual}</div>
+      </div>
+      ${renderStatusList(s.manualMap)}
+    </div>
+  </div>`;
+}
+
+/* Filters */
+function btn(label, group, val, extraCls="") {
+  const on = F[group] === val;
+  return `<button class="fbtn${on?" on"+(extraCls?" "+extraCls:""):""}" data-g="${group}" data-v="${val}">${label}</button>`;
+}
+
+function renderFilters() {
+  return `
+  <div class="filters">
+    <span class="fl">📅 From</span>
+    <input type="date" class="fi" id="fdf" value="${F.dateFrom}">
+    <span class="fl">To</span>
+    <input type="date" class="fi" id="fdt" value="${F.dateTo}">
+    <div class="fdivider"></div>
+
+    <span class="fl">Status</span>
+    <div class="btn-grp">
+      ${btn("All",               "statusGroup","all")}
+      ${btn("⏳ Ongoing (G2)",   "statusGroup","g2","g2")}
+      ${btn("✅ Done / Closed (G1)","statusGroup","g1","g1")}
+    </div>
+    <div class="fdivider"></div>
+
+    <span class="fl">Level</span>
+    <div class="btn-grp">
+      ${btn("All",      "level","all")}
+      ${btn("🤖 L0",   "level","L0","l0c")}
+      ${btn("L1",       "level","L1","l1c")}
+      ${btn("L2",       "level","L2","l2c")}
+      ${btn("L3",       "level","L3","l3c")}
+    </div>
+    <div class="fdivider"></div>
+
+    <input type="text" class="fi fsearch" id="fsearch"
+      placeholder="🔍  Search ticket key, summary, assignee…"
+      value="${esc(F.search)}" style="flex:1;min-width:220px">
+  </div>`;
+}
+
+/* Table */
+function th(label, col) {
+  const act = sortCol === col;
+  const arr = act ? (sortDir==="asc" ? " ↑" : " ↓") : " ↕";
+  return `<th data-col="${col}" class="${act?"active":""}">${label}<span style="opacity:.5;font-size:10px">${arr}</span></th>`;
+}
+
+function renderTable() {
+  const total = FILTERED.length;
+  const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const s0    = (page-1)*PAGE_SIZE;
+  const s1    = Math.min(s0+PAGE_SIZE, total);
+  const slice = FILTERED.slice(s0, s1);
+
+  const rows = slice.length
+    ? slice.map(t => {
+        const lm  = levelMeta(t.level);
+        const grp = isDone(t.status) ? "g1" : "g2";
+        return `
+        <tr>
+          <td><a class="tkey" href="${esc(t.url)}" target="_blank" rel="noopener">${esc(t.key)}</a></td>
+          <td><div class="tsum" title="${esc(t.summary)}">${esc(t.summary)}</div></td>
+          <td><span class="badge ${lm.cls}" title="${lm.tip}">${lm.short}</span></td>
+          <td><span class="badge ${grp==="g1"?"bg1":"bg2"}">${esc(t.status)}</span></td>
+          <td style="font-size:12px;white-space:nowrap">${esc(t.assignee_name)}</td>
+          <td style="font-size:12px;white-space:nowrap">${esc(t.reporter_name)}</td>
+          <td class="dcell">${fmtDate(t.created)}</td>
+          <td class="dcell">${fmtDate(t.updated)}</td>
+          <td><span class="badge ${priorityCls(t.priority)}">${esc(t.priority)}</span></td>
+        </tr>`;
+      }).join("")
+    : `<tr><td colspan="9" style="text-align:center;padding:48px;color:var(--muted)">
+         <div style="font-size:36px;margin-bottom:10px">🔍</div>
+         No tickets match the current filters.
+       </td></tr>`;
+
+  return `
+  <div class="tcard">
+    <div class="tbar">
+      <div class="tbar-title">Ticket List</div>
+      <div class="tbar-count">Showing ${total?s0+1:0}–${s1} of ${total.toLocaleString()} tickets</div>
+    </div>
+    <div class="tscroll">
+      <table>
+        <thead><tr>
+          ${th("Ticket","key")}
+          ${th("Summary","summary")}
+          <th>Level</th>
+          ${th("Status","status")}
+          ${th("Assignee","assignee_name")}
+          ${th("Reporter","reporter_name")}
+          ${th("Created","created")}
+          ${th("Updated","updated")}
+          ${th("Priority","priority")}
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+    ${renderPager(pages)}
+  </div>`;
+}
+
+function renderPager(total) {
+  if (total <= 1) return "";
+  const nums = [];
+  for (let i = 1; i <= total; i++) {
+    if (i===1 || i===total || Math.abs(i-page)<=2) nums.push(i);
+    else if (Math.abs(i-page)===3) nums.push("…");
+  }
+  // dedup adjacent ellipsis
+  const deduped = nums.filter((v,i,a) => v!=="…" || a[i-1]!=="…");
+
+  return `
+  <div class="pager">
+    <button class="pbtn" id="pprev" ${page===1?"disabled":""}>← Prev</button>
+    ${deduped.map(n => n==="…"
+        ? `<span class="pdots">…</span>`
+        : `<button class="pbtn${n===page?" on":""}" data-p="${n}">${n}</button>`
+    ).join("")}
+    <button class="pbtn" id="pnext" ${page===total?"disabled":""}>Next →</button>
+  </div>`;
+}
+
+/* ── event delegation (set up ONCE on #app which persists) ─────────────── */
+
+let searchTimer;
+
+document.getElementById("app").addEventListener("click", e => {
+  // filter toggle buttons
+  const fb = e.target.closest(".fbtn");
+  if (fb) { F[fb.dataset.g] = fb.dataset.v; applyFilters(); renderApp(); return; }
+
+  // sortable header
+  const colTh = e.target.closest("th[data-col]");
+  if (colTh) {
+    const col = colTh.dataset.col;
+    if (sortCol === col) sortDir = sortDir==="asc"?"desc":"asc";
+    else { sortCol = col; sortDir = "asc"; }
+    applyFilters(); renderApp(); return;
+  }
+
+  // pagination buttons
+  const pp = e.target.closest("[data-p]");
+  if (pp) { page = +pp.dataset.p; renderApp(); return; }
+
+  if (e.target.closest("#pprev")) { page = Math.max(1, page-1); renderApp(); return; }
+  if (e.target.closest("#pnext")) {
+    const max = Math.max(1, Math.ceil(FILTERED.length/PAGE_SIZE));
+    page = Math.min(max, page+1); renderApp(); return;
+  }
+});
+
+document.getElementById("app").addEventListener("change", e => {
+  if (e.target.id === "fdf") { F.dateFrom = e.target.value; applyFilters(); renderApp(); }
+  if (e.target.id === "fdt") { F.dateTo   = e.target.value; applyFilters(); renderApp(); }
+});
+
+document.getElementById("app").addEventListener("input", e => {
+  if (e.target.id === "fsearch") {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => { F.search = e.target.value; applyFilters(); renderApp(); }, 220);
+  }
+});
+
+/* ── boot ───────────────────────────────────────────────────────────────── */
+loadData();
+
+// Silently reload every 5 min (tickets.json updates every 15 min via Actions)
+setInterval(loadData, 5 * 60 * 1000);
+</script>
+</body>
+</html>
