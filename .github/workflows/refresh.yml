@@ -6,11 +6,23 @@ on:
     - cron: "*/15 * * * *"
   workflow_dispatch:   # allow manual trigger from the Actions tab
 
+# Permissions required for both git push and GitHub Pages deploy
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+# Only one Pages deploy at a time; cancel any in-flight deploy if a new one starts
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
 jobs:
   refresh:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write   # needed to commit tickets.json back to main
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
 
     steps:
       - name: Checkout repo
@@ -40,3 +52,13 @@ jobs:
           git diff --staged --quiet || \
             git commit -m "chore: refresh tickets [$(date -u '+%Y-%m-%d %H:%M UTC')]"
           git push
+
+      # ── Deploy the updated repo (including fresh tickets.json) to Pages ──
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: "."   # serve the repo root: dashboard.html + tickets.json
+
+      - name: Deploy to GitHub Pages
+        id: deploy
+        uses: actions/deploy-pages@v4
