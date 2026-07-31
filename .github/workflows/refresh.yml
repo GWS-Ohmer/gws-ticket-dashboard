@@ -2,8 +2,10 @@ name: Refresh Ticket Data
 
 on:
   schedule:
-    # Every 15 minutes — GitHub Actions minimum granularity
-    - cron: "*/15 * * * *"
+    # Every 10 minutes (GitHub Actions hard minimum is 5 min)
+    # 3 separate cron entries because "*/10" is unreliable on GitHub runners;
+    # explicit minutes guarantee exact fire times.
+    - cron: "0,10,20,30,40,50 * * * *"
   workflow_dispatch:   # allow manual trigger from the Actions tab
 
 # Permissions required for both git push and GitHub Pages deploy
