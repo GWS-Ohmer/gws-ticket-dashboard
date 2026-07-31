@@ -1004,6 +1004,7 @@ function renderTable() {
           <td><div class="tsum" title="${esc(t.summary)}">${esc(t.summary)}</div></td>
           <td><span class="badge ${lm.cls}" title="${lm.tip}">${lm.short}</span></td>
           <td><span class="badge ${grp==="g1"?"bg1":"bg2"}">${esc(t.status)}</span></td>
+          <td style="font-size:11px;white-space:nowrap;max-width:160px;overflow:hidden;text-overflow:ellipsis" title="${esc(t.request_type||'Unknown')}">${esc(t.request_type||'—')}</td>
           <td style="font-size:12px;white-space:nowrap">${esc(t.assignee_name)}</td>
           <td style="font-size:12px;white-space:nowrap">${esc(t.reporter_name)}</td>
           <td class="dcell">${fmtDate(t.created)}</td>
@@ -1029,6 +1030,7 @@ function renderTable() {
           ${th("Summary","summary")}
           <th>Level</th>
           ${th("Status","status")}
+          ${th("Request Type","request_type")}
           ${th("Assignee","assignee_name")}
           ${th("Reporter","reporter_name")}
           ${th("Created","created")}
