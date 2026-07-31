@@ -60,6 +60,8 @@ FIELDS = [
     "customfield_14636",   # Level  (L0 / L1 / L2 / L3)
     "resolution",
     "components",
+    "customfield_11600",   # Request Type — portal form used (GWS Resource Request, GWS Support Request, General IT Request, etc.)
+    "resolutiondate",      # ISO datetime when resolved; null if ticket is still open — used for sprint grouping
 ]
 
 MAX_PER_PAGE = 100
@@ -129,6 +131,10 @@ def normalise(issue: dict) -> dict:
     status     = f.get("status")    or {}
     status_cat = status.get("statusCategory") or {}
 
+    # Request Type — the portal form the user submitted
+    req_raw  = f.get("customfield_11600") or {}
+    req_obj  = req_raw.get("requestType") or {}
+
     return {
         "key":                 issue["key"],
         "url":                 f"{JIRA_BASE_URL}/browse/{issue['key']}",
@@ -142,9 +148,12 @@ def normalise(issue: dict) -> dict:
         "reporter_name":       reporter.get("displayName") or "Unknown",
         "created":             f.get("created") or "",
         "updated":             f.get("updated") or "",
+        "resolutiondate":      f.get("resolutiondate"),          # null if not yet resolved
         "priority":            priority.get("name") or "Normal",
         "issuetype":           (f.get("issuetype") or {}).get("name") or "",
         "resolution":          resolution.get("name"),
+        "request_type":        req_obj.get("name") or "Unknown", # portal form name
+        "request_type_id":     req_obj.get("id")   or "",        # portal form ID
     }
 
 
