@@ -2,24 +2,24 @@ name: Refresh Ticket Data
 
 on:
   schedule:
-    # Every 10 minutes (GitHub Actions hard minimum is 5 min)
-    # 3 separate cron entries because "*/10" is unreliable on GitHub runners;
-    # explicit minutes guarantee exact fire times.
-    - cron: "0,10,20,30,40,50 * * * *"
-  workflow_dispatch:   # allow manual trigger from the Actions tab
+    # Backup cron — kept as safety net but unreliable on new repos.
+    # Primary scheduling is handled by the self-trigger job below.
+    - cron: "5,15,25,35,45,55 * * * *"
+  workflow_dispatch:
 
-# Permissions required for both git push and GitHub Pages deploy
+# Permissions required for git push and GitHub Pages deploy
 permissions:
   contents: write
   pages: write
   id-token: write
 
-# Only one Pages deploy at a time; cancel any in-flight deploy if a new one starts
+# Only one Pages deploy at a time
 concurrency:
   group: pages
   cancel-in-progress: true
 
 jobs:
+  # ── Job 1: Fetch tickets from Jira and deploy to Pages ─────────────────────
   refresh:
     runs-on: ubuntu-latest
     environment:
@@ -50,17 +50,65 @@ jobs:
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add tickets.json
-          # only commit when the file actually changed
           git diff --staged --quiet || \
             git commit -m "chore: refresh tickets [$(date -u '+%Y-%m-%d %H:%M UTC')]"
           git push
 
-      # ── Deploy the updated repo (including fresh tickets.json) to Pages ──
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: "."   # serve the repo root: dashboard.html + tickets.json
+          path: "."
 
       - name: Deploy to GitHub Pages
         id: deploy
         uses: actions/deploy-pages@v4
+
+  # ── Job 2: Self-trigger — waits 10 min then dispatches the next run ────────
+  # This makes the refresh perpetually self-sustaining without relying on
+  # GitHub's unreliable cron scheduler for new repositories.
+  #
+  # REQUIRES: GH_PAT secret (Fine-grained PAT, Actions: Read & Write on this repo)
+  # Setup:    https://github.com/settings/tokens?type=beta
+  #           → Repo: gws-ticket-dashboard → Permissions: Actions = Read & Write
+  #           → Add as secret GH_PAT in this repo's Settings → Secrets
+  #
+  # Behaviour:
+  #   - Runs after "refresh" job succeeds
+  #   - Sleeps 10 minutes (free on public repos — unlimited Actions minutes)
+  #   - Calls workflow_dispatch via PAT to start the next refresh cycle
+  #   - Uses its own concurrency group so Pages deploys don't cancel the sleep
+  self_trigger:
+    needs: refresh
+    runs-on: ubuntu-latest
+    concurrency:
+      group: self-trigger
+      cancel-in-progress: false   # queue rather than cancel if two are pending
+
+    steps:
+      - name: Wait 10 min then dispatch next refresh
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+        run: |
+          if [ -z "$GH_PAT" ]; then
+            echo "⚠️  GH_PAT secret not set."
+            echo "    Add it to enable automatic 10-min self-trigger refresh."
+            echo "    Guide: https://github.com/settings/tokens?type=beta"
+            exit 0
+          fi
+
+          echo "✅ Refresh complete. Sleeping 10 min before scheduling next run..."
+          sleep 600
+
+          HTTP=$(curl -s -o /dev/null -w "%{http_code}" \
+            -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer $GH_PAT" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            https://api.github.com/repos/GWS-Ohmer/gws-ticket-dashboard/actions/workflows/refresh.yml/dispatches \
+            -d '{"ref":"main"}')
+
+          if [ "$HTTP" = "204" ]; then
+            echo "✅ Next refresh dispatched successfully (HTTP 204)"
+          else
+            echo "❌ Dispatch failed (HTTP $HTTP) — check GH_PAT permissions"
+          fi
