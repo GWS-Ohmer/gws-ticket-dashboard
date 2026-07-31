@@ -2,22 +2,22 @@ name: Refresh Ticket Data
 
 on:
   schedule:
-    # Every 30 minutes — cron is now stable (confirmed firing Jul 31 2026).
-    # Self-trigger removed: it competed with cron, causing noisy cancelled runs.
-    - cron: "0,30 * * * *"
-  workflow_dispatch:   # manual trigger still available from the Actions tab
+    # Daily safety net at midnight — restarts the self-trigger chain if it ever breaks.
+    # Primary scheduling is done by the self_trigger job below (more reliable on this repo).
+    - cron: "0 0 * * *"
+  workflow_dispatch:
 
 permissions:
   contents: write
   pages: write
   id-token: write
 
-# Only one run at a time. New run cancels any in-progress run.
 concurrency:
   group: pages
   cancel-in-progress: true
 
 jobs:
+  # ── Job 1: Fetch tickets from Jira and deploy to GitHub Pages ──────────────
   refresh:
     runs-on: ubuntu-latest
     environment:
@@ -60,3 +60,41 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deploy
         uses: actions/deploy-pages@v4
+
+  # ── Job 2: Self-trigger — sleeps 30 min then dispatches the next run ────────
+  # More reliable than GitHub's built-in cron scheduler on new/low-activity repos.
+  # Each run dispatches the next one, creating a self-sustaining 30-min chain.
+  # Requires: GH_PAT secret (Fine-grained PAT, Actions: Read & Write on this repo).
+  self_trigger:
+    needs: refresh
+    runs-on: ubuntu-latest
+    concurrency:
+      group: self-trigger
+      cancel-in-progress: false
+
+    steps:
+      - name: Wait 30 min then dispatch next refresh
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+        run: |
+          if [ -z "$GH_PAT" ]; then
+            echo "⚠️  GH_PAT secret not set — self-trigger disabled."
+            exit 0
+          fi
+
+          echo "✅ Refresh complete. Sleeping 30 min before scheduling next run..."
+          sleep 1800
+
+          HTTP=$(curl -s -o /dev/null -w "%{http_code}" \
+            -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer $GH_PAT" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            https://api.github.com/repos/GWS-Ohmer/gws-ticket-dashboard/actions/workflows/refresh.yml/dispatches \
+            -d '{"ref":"main"}')
+
+          if [ "$HTTP" = "204" ]; then
+            echo "✅ Next refresh dispatched (HTTP 204) — chain continues"
+          else
+            echo "❌ Dispatch failed (HTTP $HTTP) — check GH_PAT permissions"
+          fi
