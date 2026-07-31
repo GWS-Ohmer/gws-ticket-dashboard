@@ -257,6 +257,7 @@
     tbody tr { border-bottom: 1px solid var(--border); transition: background .1s; }
     tbody tr:last-child { border-bottom: none; }
     tbody tr:hover { background: var(--surface2); }
+    tr.sprint-active { background: rgba(79,142,247,.08) !important; outline: 1px solid rgba(79,142,247,.3); }
 
     td {
       padding: 9px 14px;
@@ -522,12 +523,112 @@ function stats(arr) {
   };
 }
 
-/* ── render ─────────────────────────────────────────────────────────────── */
+/* ── sprint helpers ─────────────────────────────────────────────────── */
+
+// Anchor: Monday July 6 2026 — same cadence as Joems' sprint naming
+const SPRINT_ANCHOR = new Date("2026-07-06T00:00:00Z");
+const SPRINT_DAYS   = 14;
+
+function sprintKey(iso) {
+  if (!iso) return null;
+  const d   = new Date(iso);
+  const ms  = d.getTime() - SPRINT_ANCHOR.getTime();
+  const idx = Math.floor(ms / (SPRINT_DAYS * 86400000));
+  const start = new Date(SPRINT_ANCHOR.getTime() + idx * SPRINT_DAYS * 86400000);
+  return "sprint-" + start.toISOString().slice(0,10);
+}
+
+function sprintLabel(key) {
+  if (!key) return "—";
+  const s  = new Date(key.replace("sprint-","") + "T00:00:00Z");
+  const e  = new Date(s.getTime() + (SPRINT_DAYS - 1) * 86400000);
+  const fmt = d => d.toLocaleDateString("en-GB",{day:"2-digit",month:"short"});
+  return `${fmt(s)} – ${fmt(e)}`;
+}
+
+// ── gap classification ───────────────────────────────────────────────────────
+// Only applies to manual (L1/L2/L3) tickets
+
+function classifyGap(ticket) {
+  if (ticket.level === "L0") return null;  // automated — no gap
+  const rt = (ticket.request_type || "").toLowerCase();
+  if (rt.includes("general it request") || rt === "unknown")
+    return { key:"wrong_form",      icon:"🔴", label:"Wrong Form",       desc:"Used generic form — should use GWS-specific portal" };
+  if (rt.includes("gws resource request"))
+    return { key:"automation_gap",  icon:"🟡", label:"Automation Gap",   desc:"Correct form but automation doesn't cover this variant yet" };
+  if (rt.includes("gws support request"))
+    return { key:"expected_manual", icon:"⚪", label:"Expected Manual",  desc:"Support / troubleshooting task — manual by design" };
+  return   { key:"other",           icon:"🔵", label:"Other",            desc:"Request type not yet classified" };
+}
+
+// ── sprint data computation ──────────────────────────────────────────────────
+
+function buildSprintData(tickets) {
+  // Group by the sprint in which the ticket was RESOLVED (matching Joems' filter)
+  // Fall back to created date for unresolved tickets
+  const sprints = {};
+
+  tickets.forEach(t => {
+    const dateToUse = t.resolutiondate || t.created;
+    const key = sprintKey(dateToUse);
+    if (!key) return;
+    if (!sprints[key]) sprints[key] = { key, l0:0, manual:0, total:0 };
+    sprints[key].total++;
+    if (t.level === "L0") sprints[key].l0++;
+    else                  sprints[key].manual++;
+  });
+
+  // Sort descending, add coverage + delta
+  const sorted = Object.values(sprints).sort((a,b) => b.key.localeCompare(a.key));
+  for (let i = 0; i < sorted.length; i++) {
+    sorted[i].coverage = sorted[i].total ? (sorted[i].l0 / sorted[i].total * 100) : 0;
+    if (i < sorted.length - 1) {
+      sorted[i].delta = sorted[i].coverage - sorted[i+1].coverage;
+    } else {
+      sorted[i].delta = null;
+    }
+  }
+  return sorted;
+}
+
+// ── gap data computation ─────────────────────────────────────────────────────
+
+function buildGapData(tickets, sprintFilter) {
+  // tickets already filtered by date/status/level from FILTERED
+  // sprintFilter: null = all, "sprint-YYYY-MM-DD" = specific sprint
+  let pool = tickets;
+  if (sprintFilter) {
+    pool = tickets.filter(t => {
+      const dateToUse = t.resolutiondate || t.created;
+      return sprintKey(dateToUse) === sprintFilter;
+    });
+  }
+
+  // group manual tickets by request_type
+  const byType = {};
+  pool.forEach(t => {
+    const rt  = t.request_type || "Unknown";
+    const gap = classifyGap(t);
+    if (!byType[rt]) byType[rt] = { name:rt, l0:0, wrong_form:0, automation_gap:0, expected_manual:0, other:0, total:0, tickets:[] };
+    byType[rt].total++;
+    byType[rt].tickets.push(t);
+    if (t.level === "L0") { byType[rt].l0++; }
+    else if (gap)         { byType[rt][gap.key]++; }
+  });
+
+  return Object.values(byType).sort((a,b) => b.total - a.total);
+}
+
+/* ── state: active sprint filter + drill-down ───────────────────────── */
+let activeSprint = null;   // null = all; "sprint-YYYY-MM-DD" = specific sprint
+let drillType    = null;   // null = hidden; string = request type name being drilled
 
 function renderApp() {
   const s = stats(ALL);
   document.getElementById("app").innerHTML =
-    renderKPI(s) + renderPanels(s) + renderFilters() + renderTable();
+    renderKPI(s) + renderPanels(s) +
+    renderSprintCoverage() + renderGapAnalysis() +
+    renderFilters() + renderTable();
 }
 
 /* KPIs */
@@ -604,6 +705,228 @@ function renderPanels(s) {
       ${renderStatusList(s.manualMap)}
     </div>
   </div>`;
+}
+
+}
+
+/* ── Sprint Coverage Table ────────────────────────────────────────────── */
+function renderSprintCoverage() {
+  const sprintData = buildSprintData(ALL);
+  if (!sprintData.length) return "";
+
+  const rows = sprintData.map(sp => {
+    const isActive = activeSprint === sp.key;
+    const cov  = sp.coverage.toFixed(1);
+    const dEl  = sp.delta === null ? "—"
+               : sp.delta  > 0    ? `<span style="color:var(--green)">+${sp.delta.toFixed(1)}pp ↑</span>`
+               : sp.delta  < 0    ? `<span style="color:var(--red)">${sp.delta.toFixed(1)}pp ↓</span>`
+               : `<span style="color:var(--muted)">0.0pp</span>`;
+
+    return `
+      <tr class="${isActive?"sprint-active":""}" data-sprint="${sp.key}" style="cursor:pointer"
+          title="Click to filter Gap Analysis to this sprint">
+        <td style="font-size:12px;font-weight:600;color:var(--accent)">${sp.key}</td>
+        <td style="font-size:12px;color:var(--muted)">${sprintLabel(sp.key)}</td>
+        <td style="font-size:13px;font-weight:600;color:var(--l0)">${sp.l0.toLocaleString()}</td>
+        <td style="font-size:13px;font-weight:600;color:var(--l2)">${sp.manual.toLocaleString()}</td>
+        <td style="font-size:13px;font-weight:700">${sp.total.toLocaleString()}</td>
+        <td>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div style="flex:1;height:6px;background:var(--surface2);border-radius:3px;overflow:hidden;min-width:60px">
+              <div style="width:${cov}%;height:100%;background:var(--green);border-radius:3px;transition:width .4s"></div>
+            </div>
+            <span style="font-size:12px;font-weight:700;color:var(--green);min-width:38px">${cov}%</span>
+          </div>
+        </td>
+        <td style="text-align:center">${dEl}</td>
+      </tr>`;
+  }).join("");
+
+  return `
+  <div class="panel" style="margin-bottom:18px">
+    <div class="panel-head" style="margin-bottom:14px">
+      <span class="panel-emoji">🗓</span>
+      <div>
+        <div class="panel-name">Sprint Coverage Trend — GWS</div>
+        <div style="font-size:11px;color:var(--muted)">Grouped by resolution date · 2-week sprints · click a row to drill into gap analysis</div>
+      </div>
+      ${activeSprint ? `<button class="fbtn" id="clear-sprint" style="margin-left:auto;font-size:11px">✕ Clear sprint filter</button>` : ""}
+    </div>
+    <div style="overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse">
+        <thead>
+          <tr style="background:var(--surface2)">
+            <th style="padding:8px 12px;text-align:left;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;border-bottom:1px solid var(--border)">Sprint</th>
+            <th style="padding:8px 12px;text-align:left;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;border-bottom:1px solid var(--border)">Period</th>
+            <th style="padding:8px 12px;text-align:left;font-size:11px;font-weight:600;color:var(--l0);text-transform:uppercase;letter-spacing:.6px;border-bottom:1px solid var(--border)">L0 Auto</th>
+            <th style="padding:8px 12px;text-align:left;font-size:11px;font-weight:600;color:var(--l2);text-transform:uppercase;letter-spacing:.6px;border-bottom:1px solid var(--border)">Manual</th>
+            <th style="padding:8px 12px;text-align:left;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;border-bottom:1px solid var(--border)">Total</th>
+            <th style="padding:8px 12px;text-align:left;font-size:11px;font-weight:600;color:var(--green);text-transform:uppercase;letter-spacing:.6px;border-bottom:1px solid var(--border)">Coverage %</th>
+            <th style="padding:8px 12px;text-align:center;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;border-bottom:1px solid var(--border)">Δ(pp)</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+  </div>`;
+}
+
+/* ── Gap Analysis Panel ───────────────────────────────────────────────── */
+function renderGapAnalysis() {
+  const gapData   = buildGapData(ALL, activeSprint);
+  const totalAuto = ALL.filter(t => t.level === "L0").length;
+  const totalManual = ALL.filter(t => t.level !== "L0").length;
+  const wrongForm   = gapData.reduce((s,r) => s + r.wrong_form, 0);
+  const autoGap     = gapData.reduce((s,r) => s + r.automation_gap, 0);
+  const opportunity = wrongForm + autoGap;
+
+  const label = activeSprint
+    ? `Sprint: ${activeSprint}`
+    : `All Tickets — ${new Date().getFullYear()}`;
+
+  const rows = gapData.map(rt => {
+    const isDrill  = drillType === rt.name;
+    const autoRate = rt.total ? (rt.l0 / rt.total * 100).toFixed(1) : "0.0";
+    const gapBadges = [
+      rt.wrong_form      ? `<span class="badge" style="background:rgba(248,113,113,.15);color:var(--red);border:1px solid rgba(248,113,113,.3)">🔴 ${rt.wrong_form} wrong form</span>` : "",
+      rt.automation_gap  ? `<span class="badge" style="background:rgba(251,191,36,.15);color:#fde68a;border:1px solid rgba(251,191,36,.3)">🟡 ${rt.automation_gap} auto gap</span>` : "",
+      rt.expected_manual ? `<span class="badge" style="background:rgba(125,133,144,.12);color:var(--muted);border:1px solid var(--border)">⚪ ${rt.expected_manual} expected</span>` : "",
+      rt.other           ? `<span class="badge" style="background:rgba(79,142,247,.1);color:var(--accent);border:1px solid rgba(79,142,247,.25)">🔵 ${rt.other} other</span>` : "",
+    ].filter(Boolean).join(" ");
+
+    return `
+      <tr data-rtname="${esc(rt.name)}" style="cursor:pointer;${isDrill?"background:var(--surface2)":""}"
+          title="Click to see individual tickets">
+        <td style="font-size:13px;font-weight:600">${esc(rt.name)}</td>
+        <td><div style="display:flex;gap:4px;flex-wrap:wrap">${gapBadges || "—"}</div></td>
+        <td style="font-size:12px;font-weight:600;color:var(--l0);text-align:center">${rt.l0}</td>
+        <td style="font-size:12px;font-weight:600;color:var(--l2);text-align:center">${rt.total - rt.l0}</td>
+        <td style="font-size:12px;font-weight:700;text-align:center">${rt.total}</td>
+        <td>
+          <div style="display:flex;align-items:center;gap:6px">
+            <div style="flex:1;height:5px;background:var(--surface2);border-radius:3px;min-width:50px;overflow:hidden">
+              <div style="width:${autoRate}%;height:100%;background:var(--green);border-radius:3px"></div>
+            </div>
+            <span style="font-size:12px;font-weight:600;color:${+autoRate>50?"var(--green)":"var(--orange)"};min-width:34px">${autoRate}%</span>
+          </div>
+        </td>
+        <td style="text-align:center;font-size:18px">${isDrill?"▲":"▼"}</td>
+      </tr>
+      ${isDrill ? renderDrilldown(rt) : ""}`;
+  }).join("");
+
+  return `
+  <div class="panel" style="margin-bottom:18px">
+    <div class="panel-head" style="margin-bottom:14px">
+      <span class="panel-emoji">🔍</span>
+      <div>
+        <div class="panel-name">Automation Gap Analysis</div>
+        <div style="font-size:11px;color:var(--muted)">${label} · click any row to drill into individual tickets</div>
+      </div>
+      <div style="margin-left:auto;text-align:right">
+        <div style="font-size:11px;color:var(--muted)">Automation opportunity</div>
+        <div style="font-size:20px;font-weight:700;color:var(--orange)">${opportunity.toLocaleString()}</div>
+        <div style="font-size:10px;color:var(--muted)">${wrongForm} wrong form + ${autoGap} auto gap</div>
+      </div>
+    </div>
+
+    <!-- opportunity summary bar -->
+    <div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap">
+      <div style="background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.25);border-radius:10px;padding:10px 16px;flex:1;min-width:160px">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--red);margin-bottom:4px">🔴 Wrong Form</div>
+        <div style="font-size:26px;font-weight:800;color:var(--red)">${wrongForm.toLocaleString()}</div>
+        <div style="font-size:11px;color:var(--muted)">Used generic form · user education needed</div>
+      </div>
+      <div style="background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.25);border-radius:10px;padding:10px 16px;flex:1;min-width:160px">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:#fde68a;margin-bottom:4px">🟡 Automation Gap</div>
+        <div style="font-size:26px;font-weight:800;color:#fde68a">${autoGap.toLocaleString()}</div>
+        <div style="font-size:11px;color:var(--muted)">Right form · automation not built yet</div>
+      </div>
+      <div style="background:rgba(125,133,144,.08);border:1px solid var(--border);border-radius:10px;padding:10px 16px;flex:1;min-width:160px">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin-bottom:4px">⚪ Expected Manual</div>
+        <div style="font-size:26px;font-weight:800;color:var(--muted)">${gapData.reduce((s,r)=>s+r.expected_manual,0).toLocaleString()}</div>
+        <div style="font-size:11px;color:var(--muted)">Support tasks · manual by design</div>
+      </div>
+    </div>
+
+    <div style="overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse">
+        <thead>
+          <tr style="background:var(--surface2)">
+            <th style="padding:8px 12px;text-align:left;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;border-bottom:1px solid var(--border)">Request Type</th>
+            <th style="padding:8px 12px;text-align:left;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;border-bottom:1px solid var(--border)">Gap Classification</th>
+            <th style="padding:8px 12px;text-align:center;font-size:11px;font-weight:600;color:var(--l0);text-transform:uppercase;border-bottom:1px solid var(--border)">L0</th>
+            <th style="padding:8px 12px;text-align:center;font-size:11px;font-weight:600;color:var(--l2);text-transform:uppercase;border-bottom:1px solid var(--border)">Manual</th>
+            <th style="padding:8px 12px;text-align:center;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;border-bottom:1px solid var(--border)">Total</th>
+            <th style="padding:8px 12px;text-align:left;font-size:11px;font-weight:600;color:var(--green);text-transform:uppercase;border-bottom:1px solid var(--border)">Auto Rate</th>
+            <th style="padding:8px 12px;text-align:center;font-size:11px;font-weight:600;color:var(--muted);border-bottom:1px solid var(--border)">Detail</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+  </div>`;
+}
+
+/* ── Drill-down: individual tickets for a request type ────────────────── */
+function renderDrilldown(rt) {
+  const tickets = rt.tickets.sort((a,b) => new Date(b.created) - new Date(a.created));
+
+  // CSV export
+  const csvHeader = "Key,Summary,Request Type,Level,Status,Assignee,Created,Gap Type\n";
+  const csvRows   = tickets.map(t => {
+    const gap = classifyGap(t);
+    return [t.key, `"${t.summary.replace(/"/g,'""')}"`, t.request_type, t.level||"N/A",
+            t.status, t.assignee_name, (t.created||"").slice(0,10),
+            gap ? gap.label : "Automated"].join(",");
+  }).join("\n");
+  const csvBlob = `data:text/csv;charset=utf-8,${encodeURIComponent(csvHeader + csvRows)}`;
+
+  const rows = tickets.slice(0,20).map(t => {
+    const lm  = levelMeta(t.level);
+    const gap = classifyGap(t);
+    return `
+      <tr>
+        <td><a class="tkey" href="${esc(t.url)}" target="_blank" rel="noopener">${esc(t.key)}</a></td>
+        <td><div style="max-width:320px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12px" title="${esc(t.summary)}">${esc(t.summary)}</div></td>
+        <td><span class="badge ${lm.cls}">${lm.short}</span></td>
+        <td>${gap ? `<span style="font-size:11px">${gap.icon} ${gap.label}</span>` : `<span style="font-size:11px;color:var(--green)">✅ Automated</span>`}</td>
+        <td><span class="badge ${isDone(t.status)?"bg1":"bg2"}" style="font-size:11px">${esc(t.status)}</span></td>
+        <td style="font-size:11px;color:var(--muted);white-space:nowrap">${esc(t.assignee_name)}</td>
+        <td style="font-size:11px;color:var(--muted);white-space:nowrap">${fmtDate(t.created)}</td>
+      </tr>`;
+  }).join("");
+
+  const more = tickets.length > 20 ? `<tr><td colspan="7" style="text-align:center;padding:10px;color:var(--muted);font-size:12px">+ ${tickets.length - 20} more tickets — export CSV to see all</td></tr>` : "";
+
+  return `
+    <tr>
+      <td colspan="7" style="padding:0">
+        <div style="margin:0 0 2px;border:1px solid var(--border);border-top:none;background:var(--surface2);padding:14px 16px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+            <div style="font-size:13px;font-weight:600">${esc(rt.name)} — ${tickets.length} ticket${tickets.length!==1?"s":""}</div>
+            <a href="${csvBlob}" download="gap-${esc(rt.name).replace(/\s+/g,'-')}.csv"
+               style="font-size:11px;color:var(--accent);text-decoration:none;border:1px solid var(--border);border-radius:6px;padding:4px 10px">
+              ⬇ Export CSV
+            </a>
+          </div>
+          <table style="width:100%;border-collapse:collapse;font-size:12px">
+            <thead>
+              <tr style="border-bottom:1px solid var(--border)">
+                <th style="padding:6px 10px;text-align:left;color:var(--muted);font-size:10px;text-transform:uppercase">Ticket</th>
+                <th style="padding:6px 10px;text-align:left;color:var(--muted);font-size:10px;text-transform:uppercase">Summary</th>
+                <th style="padding:6px 10px;text-align:left;color:var(--muted);font-size:10px;text-transform:uppercase">Level</th>
+                <th style="padding:6px 10px;text-align:left;color:var(--muted);font-size:10px;text-transform:uppercase">Gap Type</th>
+                <th style="padding:6px 10px;text-align:left;color:var(--muted);font-size:10px;text-transform:uppercase">Status</th>
+                <th style="padding:6px 10px;text-align:left;color:var(--muted);font-size:10px;text-transform:uppercase">Assignee</th>
+                <th style="padding:6px 10px;text-align:left;color:var(--muted);font-size:10px;text-transform:uppercase">Created</th>
+              </tr>
+            </thead>
+            <tbody>${rows}${more}</tbody>
+          </table>
+        </div>
+      </td>
+    </tr>`;
 }
 
 /* Filters */
@@ -747,6 +1070,26 @@ function renderPager(total) {
 let searchTimer;
 
 document.getElementById("app").addEventListener("click", e => {
+
+  // ── Sprint row click → filter gap analysis ──────────────────────────────
+  const sprintRow = e.target.closest("tr[data-sprint]");
+  if (sprintRow) {
+    const key = sprintRow.dataset.sprint;
+    activeSprint = (activeSprint === key) ? null : key;
+    drillType = null;
+    renderApp(); return;
+  }
+  if (e.target.closest("#clear-sprint")) {
+    activeSprint = null; drillType = null; renderApp(); return;
+  }
+
+  // ── Gap analysis row click → drill-down ────────────────────────────────
+  const rtRow = e.target.closest("tr[data-rtname]");
+  if (rtRow) {
+    const name = rtRow.dataset.rtname;
+    drillType = (drillType === name) ? null : name;
+    renderApp(); return;
+  }
 
   // ── Level multi-select ───────────────────────────────────────────────────
   if (e.target.closest("#lvl-all")) {
