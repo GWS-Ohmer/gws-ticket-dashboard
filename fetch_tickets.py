@@ -6,6 +6,9 @@ Fetches ALL ITH tickets with component = "Google" for the current calendar year.
 Paginates fully through the Jira REST API v3 and writes tickets.json,
 which is consumed by dashboard.html.
 
+Uses POST /rest/api/3/search/jql (new endpoint — GET /rest/api/3/search is 410 Gone).
+Pagination is token-based via the `nextPageToken` field in the response.
+
 Required env vars:
   JIRA_EMAIL      – e.g. ohmer.sulit@helloconnect.org
   JIRA_TOKEN      – Atlassian API token
@@ -61,45 +64,52 @@ FIELDS = [
 
 MAX_PER_PAGE = 100
 
+# Endpoint: POST /rest/api/3/search/jql  (replaces deprecated GET /rest/api/3/search)
+SEARCH_URL = f"{JIRA_BASE_URL}/rest/api/3/search/jql"
+
 
 # ── fetch ─────────────────────────────────────────────────────────────────────
 
 def build_session() -> requests.Session:
     s = requests.Session()
     s.auth = (JIRA_EMAIL, JIRA_TOKEN)
-    s.headers.update({"Accept": "application/json"})
+    s.headers.update({
+        "Accept":       "application/json",
+        "Content-Type": "application/json",
+    })
     return s
 
 
-def fetch_page(session: requests.Session, start_at: int) -> dict:
-    resp = session.get(
-        f"{JIRA_BASE_URL}/rest/api/3/search",
-        params={
-            "jql":        JQL,
-            "startAt":    start_at,
-            "maxResults": MAX_PER_PAGE,
-            "fields":     ",".join(FIELDS),
-        },
-        timeout=30,
-    )
+def fetch_page(session: requests.Session, next_page_token: str | None) -> dict:
+    body: dict = {
+        "jql":        JQL,
+        "maxResults": MAX_PER_PAGE,
+        "fields":     FIELDS,
+    }
+    if next_page_token:
+        body["nextPageToken"] = next_page_token
+
+    resp = session.post(SEARCH_URL, json=body, timeout=30)
     resp.raise_for_status()
     return resp.json()
 
 
 def fetch_all(session: requests.Session) -> list:
-    issues = []
-    start_at = 0
+    issues: list = []
+    next_page_token: str | None = None
+    fetched = 0
 
     while True:
-        data  = fetch_page(session, start_at)
+        data  = fetch_page(session, next_page_token)
         batch = data.get("issues", [])
         total = data.get("total", 0)
 
         issues.extend(batch)
-        start_at += len(batch)
-        print(f"  {start_at:>5,} / {total:,}", flush=True)
+        fetched += len(batch)
+        print(f"  {fetched:>5,} / {total:,}", flush=True)
 
-        if start_at >= total or not batch:
+        next_page_token = data.get("nextPageToken")
+        if not next_page_token or not batch:
             break
 
     return issues
