@@ -1,9 +1,29 @@
 {
-  "fetched_at": "2026-08-01T10:35:35.784652+00:00",
+  "fetched_at": "2026-08-01T11:06:24.068624+00:00",
   "year": 2026,
   "jql": "project = \"ITH\" AND component = \"Google\" AND created >= \"2026-01-01\" ORDER BY created DESC",
-  "total_fetched": 1840,
+  "total_fetched": 1841,
   "tickets": [
+    {
+      "key": "ITH-262974",
+      "url": "https://hellofresh.atlassian.net/browse/ITH-262974",
+      "summary": "Email PW reset",
+      "status": "Waiting for customer",
+      "status_category_key": "indeterminate",
+      "level": "L1",
+      "is_automated": false,
+      "assignee_name": "Matroll Lamalama",
+      "assignee_email": "matroll.lamalama@helloconnect.org",
+      "reporter_name": "Lee Ann Delegero",
+      "created": "2026-08-01T12:46:29.167+0200",
+      "updated": "2026-08-01T12:51:52.763+0200",
+      "resolutiondate": null,
+      "priority": "Normal",
+      "issuetype": "Service Request",
+      "resolution": null,
+      "request_type": "GWS Support Request",
+      "request_type_id": "2989"
+    },
     {
       "key": "ITH-262954",
       "url": "https://hellofresh.atlassian.net/browse/ITH-262954",
