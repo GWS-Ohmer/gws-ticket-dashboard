@@ -1,9 +1,29 @@
 {
-  "fetched_at": "2026-08-03T18:34:35.977200+00:00",
+  "fetched_at": "2026-08-03T19:05:28.026334+00:00",
   "year": 2026,
   "jql": "project = \"ITH\" AND component = \"Google\" AND created >= \"2026-01-01\" ORDER BY created DESC",
-  "total_fetched": 1848,
+  "total_fetched": 1849,
   "tickets": [
+    {
+      "key": "ITH-263232",
+      "url": "https://hellofresh.atlassian.net/browse/ITH-263232",
+      "summary": "Google Drive file ownership transfer request",
+      "status": "Open Help Desk",
+      "status_category_key": "new",
+      "level": "L2",
+      "is_automated": false,
+      "assignee_name": "Unassigned",
+      "assignee_email": "",
+      "reporter_name": "Jessica Olaniwun",
+      "created": "2026-08-03T20:34:47.516+0200",
+      "updated": "2026-08-03T20:34:58.905+0200",
+      "resolutiondate": null,
+      "priority": "Normal",
+      "issuetype": "Service Request",
+      "resolution": null,
+      "request_type": "GWS Support Request",
+      "request_type_id": "2989"
+    },
     {
       "key": "ITH-263157",
       "url": "https://hellofresh.atlassian.net/browse/ITH-263157",
