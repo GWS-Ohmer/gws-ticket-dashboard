@@ -1,9 +1,29 @@
 {
-  "fetched_at": "2026-08-03T00:51:50.072813+00:00",
+  "fetched_at": "2026-08-03T01:22:51.795135+00:00",
   "year": 2026,
   "jql": "project = \"ITH\" AND component = \"Google\" AND created >= \"2026-01-01\" ORDER BY created DESC",
-  "total_fetched": 1841,
+  "total_fetched": 1842,
   "tickets": [
+    {
+      "key": "ITH-263021",
+      "url": "https://hellofresh.atlassian.net/browse/ITH-263021",
+      "summary": "Request to create a group email distribution list",
+      "status": "In Progress",
+      "status_category_key": "indeterminate",
+      "level": "L1",
+      "is_automated": false,
+      "assignee_name": "Jon de los Santos",
+      "assignee_email": "jonathan.delossantos@helloconnect.org",
+      "reporter_name": "Reshma Malick",
+      "created": "2026-08-03T03:05:12.820+0200",
+      "updated": "2026-08-03T03:08:04.670+0200",
+      "resolutiondate": null,
+      "priority": "Normal",
+      "issuetype": "Service Request",
+      "resolution": null,
+      "request_type": "GWS Resource Request",
+      "request_type_id": "2987"
+    },
     {
       "key": "ITH-262974",
       "url": "https://hellofresh.atlassian.net/browse/ITH-262974",
