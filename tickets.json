@@ -1,9 +1,29 @@
 {
-  "fetched_at": "2026-08-03T09:56:11.803683+00:00",
+  "fetched_at": "2026-08-03T10:27:03.275640+00:00",
   "year": 2026,
   "jql": "project = \"ITH\" AND component = \"Google\" AND created >= \"2026-01-01\" ORDER BY created DESC",
-  "total_fetched": 1843,
+  "total_fetched": 1844,
   "tickets": [
+    {
+      "key": "ITH-263084",
+      "url": "https://hellofresh.atlassian.net/browse/ITH-263084",
+      "summary": "External Access to Gemini Meeting Notes",
+      "status": "In Progress",
+      "status_category_key": "indeterminate",
+      "level": "L2",
+      "is_automated": false,
+      "assignee_name": "Joemel Gallang",
+      "assignee_email": "joemel.gallang@helloconnect.org",
+      "reporter_name": "Quentin Perrot",
+      "created": "2026-08-03T11:37:37.193+0200",
+      "updated": "2026-08-03T12:04:12.973+0200",
+      "resolutiondate": null,
+      "priority": "Normal",
+      "issuetype": "Service Request",
+      "resolution": null,
+      "request_type": "GWS Support Request",
+      "request_type_id": "2989"
+    },
     {
       "key": "ITH-263059",
       "url": "https://hellofresh.atlassian.net/browse/ITH-263059",
