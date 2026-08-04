@@ -1,9 +1,29 @@
 {
-  "fetched_at": "2026-08-04T16:46:06.084392+00:00",
+  "fetched_at": "2026-08-04T17:16:57.013678+00:00",
   "year": 2026,
   "jql": "project = \"ITH\" AND component = \"Google\" AND created >= \"2026-01-01\" ORDER BY created DESC",
-  "total_fetched": 1856,
+  "total_fetched": 1857,
   "tickets": [
+    {
+      "key": "ITH-263456",
+      "url": "https://hellofresh.atlassian.net/browse/ITH-263456",
+      "summary": "Lack access to Google Form prepared by colleague who is on long sick leave",
+      "status": "Open Help Desk",
+      "status_category_key": "new",
+      "level": "L2",
+      "is_automated": false,
+      "assignee_name": "Unassigned",
+      "assignee_email": "",
+      "reporter_name": "Panos Soilis",
+      "created": "2026-08-04T19:02:05.766+0200",
+      "updated": "2026-08-04T19:02:17.525+0200",
+      "resolutiondate": null,
+      "priority": "Normal",
+      "issuetype": "Service Request",
+      "resolution": null,
+      "request_type": "GWS Support Request",
+      "request_type_id": "2989"
+    },
     {
       "key": "ITH-263413",
       "url": "https://hellofresh.atlassian.net/browse/ITH-263413",
