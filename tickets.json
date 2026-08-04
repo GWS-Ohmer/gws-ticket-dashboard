@@ -1,5 +1,5 @@
 {
-  "fetched_at": "2026-08-04T11:04:30.520425+00:00",
+  "fetched_at": "2026-08-04T11:35:24.682854+00:00",
   "year": 2026,
   "jql": "project = \"ITH\" AND component = \"Google\" AND created >= \"2026-01-01\" ORDER BY created DESC",
   "total_fetched": 1852,
@@ -336,7 +336,7 @@
       "assignee_email": "ohmer.sulit@helloconnect.org",
       "reporter_name": "Sofia Byström Borg",
       "created": "2026-07-31T11:51:46.122+0200",
-      "updated": "2026-08-03T16:46:22.569+0200",
+      "updated": "2026-08-04T13:05:35.473+0200",
       "resolutiondate": "2026-08-03T14:34:24.856+0200",
       "priority": "Low",
       "issuetype": "Service Request",
