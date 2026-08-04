@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GWS L2 Retro — Jun–Aug 2026</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  :root {
+    --bg-dark:   #0A1F0F;
+    --bg-mid:    #14532D;
+    --bg-card:   #0F3320;
+    --accent:    #10B981;
+    --accent-md: #065F46;
+    --accent-lt: #6EE7B7;
+    --accent-pl: #D1FAE5;
+    --green:     #10B981;
+    --green-dk:  #059669;
+    --red:       #EF4444;
+    --red-dk:    #DC2626;
+    --amber:     #F59E0B;
+    --blue:      #3B82F6;
+    --white:     #FFFFFF;
+    --gray-50:   #F9FAFB;
+    --gray-100:  #F3F4F6;
+    --gray-200:  #E5E7EB;
+    --gray-500:  #6B7280;
+    --gray-600:  #4B5563;
+    --gray-700:  #374151;
+    --gray-800:  #1F2937;
+  }
+
+  body {
+    font-family:'Inter',system-ui,sans-serif;
+    background:#050F08;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    min-height:100vh; overflow:hidden;
+  }
+
+  /* ── DECK & SLIDES ── */
+  .deck { width:960px; height:540px; position:relative; }
+  .slide {
+    display:none; width:960px; height:540px; border-radius:18px;
+    overflow:hidden; position:relative;
+    box-shadow:0 40px 120px rgba(0,0,0,0.75);
+  }
+  .slide.active { display:flex; }
+
+  /* ── SLIDE THEMES ── */
+  .hero {
+    background:linear-gradient(140deg, var(--bg-dark) 0%, var(--accent-md) 55%, var(--accent) 100%);
+    flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; color:var(--white);
+  }
+  .dark {
+    background:linear-gradient(140deg, var(--bg-dark) 0%, var(--bg-mid) 100%);
+    flex-direction:column; padding:38px 52px; color:var(--white);
+  }
+  .light {
+    background:linear-gradient(140deg, #F7FFF9 0%, var(--accent-pl) 100%);
+    flex-direction:column; padding:38px 52px; color:var(--gray-800);
+  }
+
+  /* ── ORBS ── */
+  .orb { position:absolute; border-radius:50%; pointer-events:none;
+    background:radial-gradient(circle,rgba(16,185,129,0.15) 0%,transparent 70%); }
+  .o1 { width:480px; height:480px; top:-160px; right:-100px; }
+  .o2 { width:300px; height:300px; bottom:-110px; left:-70px; }
+
+  /* ── TYPOGRAPHY ── */
+  .lbl { font-size:10px; font-weight:700; text-transform:uppercase;
+    letter-spacing:0.14em; color:var(--accent-lt); margin-bottom:8px; }
+  .lbl.dk { color:var(--accent); }
+  .h1 { font-size:54px; font-weight:900; letter-spacing:-2px; line-height:1.05; }
+  .h1 em { color:var(--accent-lt); font-style:normal; }
+  .h2 { font-size:26px; font-weight:800; letter-spacing:-0.4px; line-height:1.2; margin-bottom:5px; }
+  .sub { font-size:11px; opacity:.45; font-weight:500; margin-bottom:18px;
+    text-transform:uppercase; letter-spacing:.08em; }
+  .divider { height:1px; background:rgba(255,255,255,.08); margin-bottom:14px; }
+  .light .divider { background:var(--gray-200); }
+
+  /* ── BADGE & CHIP ── */
+  .badge {
+    display:inline-flex; align-items:center; gap:6px;
+    background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.18);
+    border-radius:20px; padding:6px 16px; font-size:11px; font-weight:600;
+    color:rgba(255,255,255,.8); letter-spacing:.06em; margin-bottom:22px;
+  }
+  .chip {
+    display:inline-flex; align-items:center; gap:5px;
+    background:rgba(255,255,255,.1); border-radius:16px;
+    padding:4px 12px; font-size:11px; font-weight:600; color:rgba(255,255,255,.7);
+  }
+
+  /* ── AGENDA GRID ── */
+  .agrid { display:grid; grid-template-columns:1fr 1fr; gap:10px; flex:1; }
+  .ag {
+    display:flex; align-items:center; gap:14px;
+    background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.09);
+    border-radius:12px; padding:14px 18px;
+  }
+  .an {
+    width:34px; height:34px; min-width:34px; border-radius:50%;
+    background:rgba(16,185,129,.35); display:flex; align-items:center;
+    justify-content:center; font-weight:800; font-size:13px;
+  }
+  .at { font-size:13px; font-weight:600; line-height:1.3; }
+
+  /* ── 2-PANEL GRID ── */
+  .mr-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; flex:1; margin-top:2px; }
+  .mr-box { background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); border-radius:14px; padding:18px 16px; display:flex; flex-direction:column; }
+  .mr-box .mh { font-size:13px; font-weight:800; margin-bottom:8px; }
+  .mr-box .mdesc { font-size:11px; opacity:.55; line-height:1.5; margin-bottom:10px; }
+  .mr-box .mrow {
+    display:flex; align-items:flex-start; gap:8px;
+    background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.07);
+    border-radius:8px; padding:9px 11px; margin-bottom:6px;
+  }
+  .mr-box .mrow:last-child { margin-bottom:0; }
+  .mr-box .mrow .mt { font-size:12px; font-weight:700; margin-bottom:2px; }
+  .mr-box .mrow .md { font-size:10.5px; opacity:.6; line-height:1.4; }
+
+  /* ── FEATURE LIST ── */
+  .flist { display:flex; flex-direction:column; gap:7px; }
+  .fr {
+    display:flex; align-items:center; gap:12px;
+    background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08);
+    border-radius:9px; padding:9px 14px;
+  }
+  .fi { font-size:17px; width:24px; text-align:center; flex-shrink:0; }
+  .fn { font-size:12px; font-weight:700; width:215px; flex-shrink:0; line-height:1.3; }
+  .fd { font-size:11px; opacity:.6; flex:1; line-height:1.45; }
+  .pill { font-size:10px; font-weight:700; padding:3px 9px; border-radius:10px; flex-shrink:0; white-space:nowrap; }
+  .pY { background:rgba(16,185,129,.2); color:#10B981; }
+  .pN { background:rgba(239,68,68,.15); color:#EF4444; }
+  .pL { background:rgba(245,158,11,.2); color:#F59E0B; }
+
+  /* ── 2×2 USE CASE CARDS ── */
+  .uc-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; flex:1; }
+  .uc { border-radius:12px; padding:14px 16px; }
+  .uc-dark { background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); }
+  .uc-light { background:var(--white); border:1px solid var(--gray-200); box-shadow:0 1px 4px rgba(0,0,0,.06); }
+  .uc .uh { font-size:13px; font-weight:700; margin-bottom:8px; display:flex; align-items:center; gap:7px; }
+  .uc .uh.dk { color:var(--gray-800); }
+  .uc .ub { font-size:11.5px; line-height:1.7; }
+  .uc .ub.lt { opacity:.7; }
+  .uc .ub.dk { color:var(--gray-600); }
+
+  /* ── WRAP-UP STEPS ── */
+  .wsteps { display:flex; flex-direction:column; gap:8px; margin-top:18px; width:600px; }
+  .ws { display:flex; align-items:center; gap:14px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.12); border-radius:10px; padding:10px 16px; }
+  .wsn { background:rgba(16,185,129,.55); width:26px; height:26px; min-width:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:12px; flex-shrink:0; }
+  .wst { font-size:12.5px; line-height:1.4; text-align:left; }
+
+  /* ── SLIDE NUMBER ── */
+  .sn { position:absolute; bottom:14px; right:18px; font-size:10px; font-weight:600; opacity:.28; z-index:10; color:var(--white); }
+  .light .sn { color:var(--gray-500); }
+
+  /* ── NAVIGATION ── */
+  .nav { display:flex; align-items:center; gap:16px; margin-top:18px; }
+  .nb { background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); color:var(--white); width:42px; height:42px; border-radius:50%; cursor:pointer; font-size:18px; display:flex; align-items:center; justify-content:center; transition:background .2s; user-select:none; }
+  .nb:hover { background:rgba(255,255,255,.18); }
+  .nb:disabled { opacity:.2; cursor:not-allowed; }
+  .pb { width:200px; height:4px; background:rgba(255,255,255,.12); border-radius:2px; overflow:hidden; }
+  .pf { height:100%; background:linear-gradient(90deg, var(--accent), var(--accent-lt)); border-radius:2px; transition:width .3s ease; }
+  .pc { font-size:12px; color:rgba(255,255,255,.4); min-width:52px; text-align:center; }
+  .hint { font-size:11px; color:rgba(255,255,255,.2); margin-top:7px; text-align:center; }
+</style>
+</head>
+<body>
+<div class="deck">
+
+<!-- ════════════════════════════════════
+     SLIDE 1 — TITLE
+════════════════════════════════════ -->
+<div class="slide hero active" id="s1">
+  <div class="orb o1"></div><div class="orb o2"></div>
+  <div class="badge">🔄 GWS L2 · Jun–Aug 2026</div>
+  <div style="width:78px;height:78px;background:rgba(255,255,255,.12);border-radius:22px;display:flex;align-items:center;justify-content:center;font-size:42px;margin-bottom:22px;border:1px solid rgba(255,255,255,.18);">🔁</div>
+  <div class="h1">2-Month<br><em>Retro</em></div>
+  <div style="font-size:16px;opacity:.55;margin-top:11px;margin-bottom:24px;">Google Workspace L2 Engineering</div>
+  <div style="display:flex;gap:10px;justify-content:center;">
+    <div class="chip">Ohmer Sulit</div>
+    <div class="chip">Jun – Aug 2026</div>
+    <div class="chip">For Vasco</div>
+  </div>
+  <div class="sn">1 / 9</div>
+</div>
+
+<!-- ════════════════════════════════════
+     SLIDE 2 — AGENDA
+════════════════════════════════════ -->
+<div class="slide dark" id="s2">
+  <div class="orb o1"></div>
+  <div class="lbl">Agenda</div>
+  <div class="h2">What We're Covering</div>
+  <div class="sub">5 sections · direct and to the point</div>
+  <div class="divider"></div>
+  <div class="agrid">
+    <div class="ag">
+      <div class="an">1</div>
+      <div class="at">What Went Well</div>
+    </div>
+    <div class="ag">
+      <div class="an">2</div>
+      <div class="at">What Could Have Gone Better</div>
+    </div>
+    <div class="ag">
+      <div class="an">3</div>
+      <div class="at">Lessons Learned</div>
+    </div>
+    <div class="ag">
+      <div class="an">4</div>
+      <div class="at">Ideas to Tackle Pain Points</div>
+    </div>
+    <div class="ag">
+      <div class="an">5</div>
+      <div class="at">Actions</div>
+    </div>
+  </div>
+  <div class="sn">2 / 9</div>
+</div>
+
+<!-- ════════════════════════════════════
+     SLIDE 3 — WHAT WENT WELL 1/2
+     RFC Skill + Rovo Agent
+════════════════════════════════════ -->
+<div class="slide dark" id="s3">
+  <div class="orb o1"></div>
+  <div class="lbl">✅ What Went Well · 1 of 2</div>
+  <div class="h2">RFC Skill &amp; Rovo GWS Agent</div>
+  <div class="sub">Two tools built to work smarter — both in active use</div>
+  <div class="divider"></div>
+  <div class="mr-grid">
+
+    <div class="mr-box">
+      <div class="mh">🔧 Claude Connector RFC Skill</div>
+      <div class="mdesc">A skill in Claude that automates RFC document creation for connector and plugin approval requests — no manual template filling required.</div>
+      <div class="mrow"><div><div class="mt">Auto-researches the vendor</div><div class="md">Pulls official docs, privacy policies, and data scope from public sources — no manual hunting.</div></div></div>
+      <div class="mrow"><div><div class="mt">Fills the Sec team RFC template</div><div class="md">Maps findings to every required field — output is ready for security review as-is.</div></div></div>
+      <div class="mrow"><div><div class="mt">Links official sources throughout</div><div class="md">Every claim is backed by a verifiable link — reduces back-and-forth with Sec team.</div></div></div>
+    </div>
+
+    <div class="mr-box">
+      <div class="mh">🤖 Rovo GWS Agent (Atlassian)</div>
+      <div class="mdesc">A custom Atlassian Rovo agent that lives inside Jira and Confluence — built to support GWS L2 ticket handling and documentation quality.</div>
+      <div class="mrow"><div><div class="mt">Cross-references related Jira tickets</div><div class="md">Surfaces historical context automatically — no manual searching across hundreds of tickets.</div></div></div>
+      <div class="mrow"><div><div class="mt">Drafts SOPs and publishes to Confluence</div><div class="md">Generates SOP drafts and pushes them directly to the right Confluence page.</div></div></div>
+      <div class="mrow"><div><div class="mt">Companion — I own the work</div><div class="md">I handle every ticket. The agent removes documentation overhead and enforces ticket hygiene.</div></div></div>
+    </div>
+
+  </div>
+  <div class="sn">3 / 9</div>
+</div>
+
+<!-- ════════════════════════════════════
+     SLIDE 4 — WHAT WENT WELL 2/2
+     GYB Discovery + IT Ticket Dashboard
+════════════════════════════════════ -->
+<div class="slide dark" id="s4">
+  <div class="orb o1"></div>
+  <div class="lbl">✅ What Went Well · 2 of 2</div>
+  <div class="h2">GYB Discovery &amp; IT Ticket Dashboard</div>
+  <div class="sub">A new tool mastered · a live dashboard built for the team</div>
+  <div class="divider"></div>
+  <div class="mr-grid">
+
+    <div class="mr-box">
+      <div class="mh">📦 GYB Discovery Task</div>
+      <div class="mdesc">Tasked by Patrizia to explore GYB from scratch with Joemel. Went from sandbox testing to a full production playbook.</div>
+      <div class="mrow"><div><div class="mt">Sandbox → VM + tmux → Production</div><div class="md">Started in dev, built up to VM with tmux — eliminates the need to keep your device on during long migrations.</div></div></div>
+      <div class="mrow"><div><div class="mt">Joemel ran first live migration</div><div class="md">219MB production ticket handled successfully from the playbook we built together.</div></div></div>
+      <div class="mrow"><div><div class="mt">7 SOPs published to GWM space</div><div class="md">Full setup, execution, storage hygiene, and pruning guides — all live in Confluence for the team.</div></div></div>
+    </div>
+
+    <div class="mr-box">
+      <div class="mh">📊 Google Workspace — IT Ticket Dashboard</div>
+      <div class="mdesc">A live GitHub Pages dashboard for GWS ITH tickets — co-built with Joemel, inspired by Mohamed's work. Replaces manual sprint report pulling entirely.</div>
+      <div class="mrow"><div><div class="mt">4 live KPI cards at a glance</div><div class="md">Total tickets, Automated L0 (IT Bot), Manual L1/L2/L3, and completion rate — updated every sync, no manual counting.</div></div></div>
+      <div class="mrow"><div><div class="mt">L0 Automated vs Manual split</div><div class="md">Separates IT Bot-handled tickets from human-handled ones — shows exactly what the team owns vs what runs itself.</div></div></div>
+      <div class="mrow"><div><div class="mt">Sprint Coverage Trend — drill-down</div><div class="md">2-week sprint table with L0, Manual, Total, Coverage %, and delta. Click any sprint row to drill into gap analysis.</div></div></div>
+    </div>
+
+  </div>
+  <div class="sn">4 / 9</div>
+</div>
+
+<!-- ════════════════════════════════════
+     SLIDE 5 — WHAT COULD HAVE GONE BETTER
+════════════════════════════════════ -->
+<div class="slide dark" id="s5">
+  <div class="orb o1"></div>
+  <div class="lbl">⚠️ What Could Have Gone Better</div>
+  <div class="h2">Five Things I'd Do Differently</div>
+  <div class="sub">Honest — no noise</div>
+  <div class="divider"></div>
+  <div class="flist">
+    <div class="fr">
+      <div class="fi">💻</div>
+      <div class="fn">SSD crashed — all local work lost</div>
+      <div class="fd">Everything I was working on was on my machine with no backup. Had to rebuild from scratch when the drive failed.</div>
+      <div class="pill pN">No backup</div>
+    </div>
+    <div class="fr">
+      <div class="fi">📢</div>
+      <div class="fn">GYB in production — no advance notice</div>
+      <div class="fd">The process worked as expected. But Patrizia wasn't briefed before we ran it in production — raised questions on credentials and security posture.</div>
+      <div class="pill pL">Comms gap</div>
+    </div>
+    <div class="fr">
+      <div class="fi">💸</div>
+      <div class="fn">Claude token usage at the edge</div>
+      <div class="fd">Was consuming tokens close to the budget limit without tracking it. No awareness of cost until it became a concern.</div>
+      <div class="pill pL">Cost risk</div>
+    </div>
+    <div class="fr">
+      <div class="fi">🔄</div>
+      <div class="fn">Connector ISSD tickets aging weeks</div>
+      <div class="fd">The RFC and approval process with Sec has no defined SLA — tickets stay open for days or weeks with no movement.</div>
+      <div class="pill pN">No SLA</div>
+    </div>
+    <div class="fr">
+      <div class="fi">🤖</div>
+      <div class="fn">Over-relying on AI for comms &amp; docs</div>
+      <div class="fd">Found myself using AI for almost every formal message. Not always the right call — especially in longer collaborations where authentic voice matters.</div>
+      <div class="pill pL">Quality risk</div>
+    </div>
+  </div>
+  <div class="sn">5 / 9</div>
+</div>
+
+<!-- ════════════════════════════════════
+     SLIDE 6 — LESSONS LEARNED
+════════════════════════════════════ -->
+<div class="slide dark" id="s6">
+  <div class="orb o1"></div>
+  <div class="lbl">📖 Lessons Learned</div>
+  <div class="h2">Four Things I'm Taking Forward</div>
+  <div class="sub">From experience, not theory</div>
+  <div class="divider"></div>
+  <div class="uc-grid">
+
+    <div class="uc uc-dark">
+      <div class="uh lt">☁️ Cloud-first is non-negotiable</div>
+      <div class="ub lt">Losing an SSD hurt because the work wasn't versioned. Anything local-only is at risk. Everything now lives in the fusion-kitchen playground — backed up and collaborative.</div>
+    </div>
+
+    <div class="uc uc-dark">
+      <div class="uh lt">📣 Communicate before, not after</div>
+      <div class="ub lt">GYB in production worked — but Patrizia didn't know until she asked. Confidence in the setup is not a substitute for a one-line Slack message to your lead first.</div>
+    </div>
+
+    <div class="uc uc-dark">
+      <div class="uh lt">⚖️ Match the tool to the job</div>
+      <div class="ub lt">Claude is powerful but costs tokens. Rovo is free and lives inside Atlassian. Routine ticket work → Rovo. Complex non-ticket tasks → Claude. Simple rule, real saving.</div>
+    </div>
+
+    <div class="uc uc-dark">
+      <div class="uh lt">✍️ Own your voice</div>
+      <div class="ub lt">AI can draft — but every message sent should sound like me. Over-delegating comms to AI in long collaborations erodes trust. Review everything before it goes out.</div>
+    </div>
+
+  </div>
+  <div class="sn">6 / 9</div>
+</div>
+
+<!-- ════════════════════════════════════
+     SLIDE 7 — IDEAS
+════════════════════════════════════ -->
+<div class="slide dark" id="s7">
+  <div class="orb o1"></div>
+  <div class="lbl">💡 Ideas to Tackle Pain Points</div>
+  <div class="h2">Four Ideas Worth Pursuing</div>
+  <div class="sub">Directly tied to what could have gone better</div>
+  <div class="divider"></div>
+  <div class="uc-grid">
+
+    <div class="uc uc-dark">
+      <div class="uh lt">📋 RFC approval SLA with Sec team</div>
+      <div class="ub lt">Connector and plugin ISSD tickets sit open for weeks — no agreed turnaround with Security. Propose a defined review window, e.g. 5 business days from SECHELP ticket creation.</div>
+    </div>
+
+    <div class="uc uc-dark">
+      <div class="uh lt">📣 Pre-production check-in habit</div>
+      <div class="ub lt">Before any new tool, process, or script hits production — brief the lead first. Even a one-line Slack message. No exceptions regardless of confidence in the setup.</div>
+    </div>
+
+    <div class="uc uc-dark">
+      <div class="uh lt">🤖 Rovo-first rule for ticket work</div>
+      <div class="ub lt">Use Rovo (Atlassian) for all routine ticket handling, cross-referencing, and SOP drafting. Reserve Claude for complex non-ticket work where depth matters. Formalise as a working standard.</div>
+    </div>
+
+    <div class="uc uc-dark">
+      <div class="uh lt">✍️ AI draft protocol</div>
+      <div class="ub lt">Every AI-generated message or document gets a personal review pass before it's sent or published. AI drafts — I finalise. One extra minute, but the message stays mine.</div>
+    </div>
+
+  </div>
+  <div class="sn">7 / 9</div>
+</div>
+
+<!-- ════════════════════════════════════
+     SLIDE 8 — ACTIONS
+════════════════════════════════════ -->
+<div class="slide hero" id="s8">
+  <div class="orb o1"></div><div class="orb o2"></div>
+  <div class="badge">🎯 Actions</div>
+  <div class="h1" style="font-size:38px;margin-bottom:6px;">What I'm<br><em>Committing To</em></div>
+  <div class="wsteps">
+    <div class="ws">
+      <div class="wsn">1</div>
+      <span class="wst">All personal work in fusion-kitchen playground — no local-only files going forward &nbsp;✓&nbsp; Already done</span>
+    </div>
+    <div class="ws">
+      <div class="wsn">2</div>
+      <span class="wst">Brief Patrizia or lead before any new tool or process goes to production — always, no exceptions</span>
+    </div>
+    <div class="ws">
+      <div class="wsn">3</div>
+      <span class="wst">Rovo for tickets and routine work · Claude for complex non-ticket tasks only — reduce token cost now</span>
+    </div>
+    <div class="ws">
+      <div class="wsn">4</div>
+      <span class="wst">Push for a defined RFC review SLA with Sec team — target Q3 2026 agreement</span>
+    </div>
+    <div class="ws">
+      <div class="wsn">5</div>
+      <span class="wst">Review every AI draft before sending — my voice, my accountability, every time</span>
+    </div>
+  </div>
+  <div class="sn">8 / 9</div>
+</div>
+
+<!-- ════════════════════════════════════
+     SLIDE 9 — CLOSE
+════════════════════════════════════ -->
+<div class="slide hero" id="s9">
+  <div class="orb o1"></div><div class="orb o2"></div>
+  <div style="width:78px;height:78px;background:rgba(255,255,255,.12);border-radius:22px;display:flex;align-items:center;justify-content:center;font-size:42px;margin-bottom:20px;border:1px solid rgba(255,255,255,.18);">🙏</div>
+  <div class="h1" style="font-size:44px;">Thanks,<br><em>Vasco</em></div>
+  <div style="font-size:15px;opacity:.55;margin-top:14px;margin-bottom:26px;max-width:480px;line-height:1.75;text-align:center;">
+    Good two months. More built than broken.<br>The gaps I found are fixable — and I already know how to fix them.
+  </div>
+  <div style="display:flex;gap:10px;justify-content:center;">
+    <div class="chip">Ohmer Sulit</div>
+    <div class="chip">GWS L2 Engineering</div>
+    <div class="chip">Aug 2026</div>
+  </div>
+  <div class="sn">9 / 9</div>
+</div>
+
+</div><!-- end .deck -->
+
+<!-- ── NAVIGATION ── -->
+<div class="nav">
+  <button class="nb" id="pB" onclick="go(-1)" disabled>←</button>
+  <div class="pb"><div class="pf" id="pf" style="width:11.11%;"></div></div>
+  <div class="pc" id="cnt">1 / 9</div>
+  <button class="nb" id="nB" onclick="go(1)">→</button>
+</div>
+<div class="hint">← → arrow keys · F11 for fullscreen</div>
+
+<script>
+  let c=1, tot=9;
+  function go(d){
+    document.getElementById('s'+c).classList.remove('active');
+    c=Math.max(1,Math.min(tot,c+d));
+    document.getElementById('s'+c).classList.add('active');
+    document.getElementById('pf').style.width=(c/tot*100)+'%';
+    document.getElementById('cnt').textContent=c+' / '+tot;
+    document.getElementById('pB').disabled=c===1;
+    document.getElementById('nB').disabled=c===tot;
+  }
+  document.addEventListener('keydown',e=>{
+    if(['ArrowRight','ArrowDown',' '].includes(e.key)){e.preventDefault();go(1);}
+    if(['ArrowLeft','ArrowUp'].includes(e.key)){e.preventDefault();go(-1);}
+  });
+</script>
+</body>
+</html>
