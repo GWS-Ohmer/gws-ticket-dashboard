@@ -1,5 +1,5 @@
 {
-  "fetched_at": "2026-08-04T03:19:44.256119+00:00",
+  "fetched_at": "2026-08-04T03:50:52.660031+00:00",
   "year": 2026,
   "jql": "project = \"ITH\" AND component = \"Google\" AND created >= \"2026-01-01\" ORDER BY created DESC",
   "total_fetched": 1850,
@@ -276,7 +276,7 @@
       "assignee_email": "ohmer.sulit@helloconnect.org",
       "reporter_name": "Rida Mehboob",
       "created": "2026-07-31T12:28:49.817+0200",
-      "updated": "2026-08-04T05:18:43.856+0200",
+      "updated": "2026-08-04T05:40:09.696+0200",
       "resolutiondate": null,
       "priority": "Normal",
       "issuetype": "Service Request",
