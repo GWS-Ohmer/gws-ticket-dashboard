@@ -1,9 +1,29 @@
 {
-  "fetched_at": "2026-08-04T13:08:12.674568+00:00",
+  "fetched_at": "2026-08-04T13:39:26.348636+00:00",
   "year": 2026,
   "jql": "project = \"ITH\" AND component = \"Google\" AND created >= \"2026-01-01\" ORDER BY created DESC",
-  "total_fetched": 1852,
+  "total_fetched": 1853,
   "tickets": [
+    {
+      "key": "ITH-263382",
+      "url": "https://hellofresh.atlassian.net/browse/ITH-263382",
+      "summary": "Unsubscribed from general HUB mail",
+      "status": "Open Help Desk",
+      "status_category_key": "new",
+      "level": "L2",
+      "is_automated": false,
+      "assignee_name": "Unassigned",
+      "assignee_email": "",
+      "reporter_name": "Nick Lammers",
+      "created": "2026-08-04T15:21:32.687+0200",
+      "updated": "2026-08-04T15:21:43.097+0200",
+      "resolutiondate": null,
+      "priority": "Normal",
+      "issuetype": "Service Request",
+      "resolution": null,
+      "request_type": "GWS Resource Request",
+      "request_type_id": "2987"
+    },
     {
       "key": "ITH-263321",
       "url": "https://hellofresh.atlassian.net/browse/ITH-263321",
