@@ -1,9 +1,29 @@
 {
-  "fetched_at": "2026-08-04T17:16:57.013678+00:00",
+  "fetched_at": "2026-08-04T17:47:59.759426+00:00",
   "year": 2026,
   "jql": "project = \"ITH\" AND component = \"Google\" AND created >= \"2026-01-01\" ORDER BY created DESC",
-  "total_fetched": 1857,
+  "total_fetched": 1858,
   "tickets": [
+    {
+      "key": "ITH-263460",
+      "url": "https://hellofresh.atlassian.net/browse/ITH-263460",
+      "summary": "Need to get a new user set up",
+      "status": "Resolved",
+      "status_category_key": "done",
+      "level": "L2",
+      "is_automated": false,
+      "assignee_name": "Unassigned",
+      "assignee_email": "",
+      "reporter_name": "Anthony Adragna",
+      "created": "2026-08-04T19:25:40.026+0200",
+      "updated": "2026-08-04T19:33:33.784+0200",
+      "resolutiondate": "2026-08-04T19:33:30.646+0200",
+      "priority": "Normal",
+      "issuetype": "Service Request",
+      "resolution": "Resolved",
+      "request_type": "GWS Resource Request",
+      "request_type_id": "2987"
+    },
     {
       "key": "ITH-263456",
       "url": "https://hellofresh.atlassian.net/browse/ITH-263456",
