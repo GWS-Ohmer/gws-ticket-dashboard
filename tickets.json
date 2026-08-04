@@ -1,5 +1,5 @@
 {
-  "fetched_at": "2026-08-04T11:35:24.682854+00:00",
+  "fetched_at": "2026-08-04T12:06:20.043877+00:00",
   "year": 2026,
   "jql": "project = \"ITH\" AND component = \"Google\" AND created >= \"2026-01-01\" ORDER BY created DESC",
   "total_fetched": 1852,
@@ -36,7 +36,7 @@
       "assignee_email": "",
       "reporter_name": "Oyedele Ojo",
       "created": "2026-08-04T09:52:53.902+0200",
-      "updated": "2026-08-04T10:09:36.662+0200",
+      "updated": "2026-08-04T14:03:57.523+0200",
       "resolutiondate": null,
       "priority": "Normal",
       "issuetype": "Service Request",
