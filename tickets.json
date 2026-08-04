@@ -1,5 +1,5 @@
 {
-  "fetched_at": "2026-08-04T02:17:57.972092+00:00",
+  "fetched_at": "2026-08-04T02:48:54.995556+00:00",
   "year": 2026,
   "jql": "project = \"ITH\" AND component = \"Google\" AND created >= \"2026-01-01\" ORDER BY created DESC",
   "total_fetched": 1850,
@@ -16,7 +16,7 @@
       "assignee_email": "jonathan.delossantos@helloconnect.org",
       "reporter_name": "Max Robins",
       "created": "2026-08-04T04:13:26.266+0200",
-      "updated": "2026-08-04T04:17:32.079+0200",
+      "updated": "2026-08-04T04:37:41.540+0200",
       "resolutiondate": null,
       "priority": "High",
       "issuetype": "Service Request",
