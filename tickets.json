@@ -1,9 +1,29 @@
 {
-  "fetched_at": "2026-08-04T01:47:12.931434+00:00",
+  "fetched_at": "2026-08-04T02:17:57.972092+00:00",
   "year": 2026,
   "jql": "project = \"ITH\" AND component = \"Google\" AND created >= \"2026-01-01\" ORDER BY created DESC",
-  "total_fetched": 1849,
+  "total_fetched": 1850,
   "tickets": [
+    {
+      "key": "ITH-263261",
+      "url": "https://hellofresh.atlassian.net/browse/ITH-263261",
+      "summary": "Create a google share drive where I can easily send critical information to contractors",
+      "status": "In Progress",
+      "status_category_key": "indeterminate",
+      "level": "L1",
+      "is_automated": false,
+      "assignee_name": "Jon de los Santos",
+      "assignee_email": "jonathan.delossantos@helloconnect.org",
+      "reporter_name": "Max Robins",
+      "created": "2026-08-04T04:13:26.266+0200",
+      "updated": "2026-08-04T04:17:32.079+0200",
+      "resolutiondate": null,
+      "priority": "High",
+      "issuetype": "Service Request",
+      "resolution": null,
+      "request_type": "GWS Resource Request",
+      "request_type_id": "2987"
+    },
     {
       "key": "ITH-263232",
       "url": "https://hellofresh.atlassian.net/browse/ITH-263232",
