@@ -1,5 +1,5 @@
 {
-  "fetched_at": "2026-08-05T18:35:22.992204+00:00",
+  "fetched_at": "2026-08-05T19:06:19.589630+00:00",
   "year": 2026,
   "jql": "project = \"ITH\" AND component = \"Google\" AND created >= \"2026-01-01\" ORDER BY created DESC",
   "total_fetched": 1877,
@@ -756,7 +756,7 @@
       "assignee_email": "ohmer.sulit@helloconnect.org",
       "reporter_name": "Kristin Haar",
       "created": "2026-07-31T22:33:32.379+0200",
-      "updated": "2026-08-05T19:12:22.884+0200",
+      "updated": "2026-08-05T20:52:15.536+0200",
       "resolutiondate": "2026-08-05T16:56:34.473+0200",
       "priority": "High",
       "issuetype": "Service Request",
