@@ -1,9 +1,29 @@
 {
-  "fetched_at": "2026-08-05T02:33:12.568558+00:00",
+  "fetched_at": "2026-08-05T03:04:11.897711+00:00",
   "year": 2026,
   "jql": "project = \"ITH\" AND component = \"Google\" AND created >= \"2026-01-01\" ORDER BY created DESC",
-  "total_fetched": 1860,
+  "total_fetched": 1861,
   "tickets": [
+    {
+      "key": "ITH-263531",
+      "url": "https://hellofresh.atlassian.net/browse/ITH-263531",
+      "summary": "Create GCP project for App Google OAuth",
+      "status": "Open L2 GWS Support",
+      "status_category_key": "new",
+      "level": "L2",
+      "is_automated": false,
+      "assignee_name": "Unassigned",
+      "assignee_email": "",
+      "reporter_name": "Charles Liang",
+      "created": "2026-08-05T04:56:05.283+0200",
+      "updated": "2026-08-05T04:59:29.531+0200",
+      "resolutiondate": null,
+      "priority": "Low",
+      "issuetype": "Service Request",
+      "resolution": null,
+      "request_type": "GCP Requests",
+      "request_type_id": "3051"
+    },
     {
       "key": "ITH-263483",
       "url": "https://hellofresh.atlassian.net/browse/ITH-263483",
