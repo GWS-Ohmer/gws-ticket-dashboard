@@ -1,5 +1,5 @@
 {
-  "fetched_at": "2026-08-05T11:51:48.496637+00:00",
+  "fetched_at": "2026-08-05T12:22:44.827207+00:00",
   "year": 2026,
   "jql": "project = \"ITH\" AND component = \"Google\" AND created >= \"2026-01-01\" ORDER BY created DESC",
   "total_fetched": 1870,
@@ -116,7 +116,7 @@
       "assignee_email": "joemel.gallang@helloconnect.org",
       "reporter_name": "Colin Kreeftenberg",
       "created": "2026-08-05T11:12:49.982+0200",
-      "updated": "2026-08-05T13:37:33.089+0200",
+      "updated": "2026-08-05T13:58:45.215+0200",
       "resolutiondate": null,
       "priority": "High",
       "issuetype": "Service Request",
