@@ -1,9 +1,29 @@
 {
-  "fetched_at": "2026-08-05T23:45:06.654535+00:00",
+  "fetched_at": "2026-08-06T00:15:55.194432+00:00",
   "year": 2026,
   "jql": "project = \"ITH\" AND component = \"Google\" AND created >= \"2026-01-01\" ORDER BY created DESC",
-  "total_fetched": 1878,
+  "total_fetched": 1879,
   "tickets": [
+    {
+      "key": "ITH-263793",
+      "url": "https://hellofresh.atlassian.net/browse/ITH-263793",
+      "summary": "Adding team members to Email groups",
+      "status": "Waiting for customer",
+      "status_category_key": "indeterminate",
+      "level": "L1",
+      "is_automated": false,
+      "assignee_name": "Jon de los Santos",
+      "assignee_email": "jonathan.delossantos@helloconnect.org",
+      "reporter_name": "Jessica Johnson",
+      "created": "2026-08-06T01:59:39.291+0200",
+      "updated": "2026-08-06T02:04:42.906+0200",
+      "resolutiondate": null,
+      "priority": "Low",
+      "issuetype": "Service Request",
+      "resolution": null,
+      "request_type": "GWS Support Request",
+      "request_type_id": "2989"
+    },
     {
       "key": "ITH-263774",
       "url": "https://hellofresh.atlassian.net/browse/ITH-263774",
