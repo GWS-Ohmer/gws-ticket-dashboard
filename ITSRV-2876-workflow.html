@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ITSRV-2876 — ISSD Workflow</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'base',
+    flowchart: { curve: 'linear', nodeSpacing: 50, rankSpacing: 60 },
+    themeVariables: {
+      primaryColor:       '#FFFFFF',
+      primaryTextColor:   '#172B4D',
+      primaryBorderColor: '#C1C7D0',
+      lineColor:          '#8993A4',
+      fontSize:           '14px',
+      edgeLabelBackground:'#F8F9FA'
+    }
+  });
+</script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #ECEEF1;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+    padding: 40px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+  }
+
+  .card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 20px rgba(0,0,0,.08);
+    width: 100%;
+    max-width: 1100px;
+    overflow: hidden;
+  }
+
+  .card-header {
+    padding: 20px 28px 16px;
+    border-bottom: 1px solid #EBECF0;
+  }
+  .card-header h2 { font-size: 15px; font-weight: 700; color: #172B4D; }
+  .card-header p  { font-size: 12px; color: #6B778C; margin-top: 3px; }
+  .tags { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+  .tag { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 4px; }
+  .tg { background:#E3FCEF; color:#006644; border:1px solid #ABF5D1; }
+  .ta { background:#EAE6FF; color:#403294; border:1px solid #C0B6F2; }
+  .tb { background:#DEEBFF; color:#0747A6; border:1px solid #B3D4FF; }
+
+  .diagram-area {
+    background: #FAFBFC;
+    background-image: radial-gradient(circle, #C8D0DC 1px, transparent 1px);
+    background-size: 22px 22px;
+    border-bottom: 1px solid #EBECF0;
+    padding: 40px 32px;
+    overflow-x: auto;
+  }
+
+  /* ── Mermaid node overrides ── */
+  .mermaid { display: flex; justify-content: center; min-width: 800px; }
+
+  /* Make the WFC node green */
+  #mermaid-diagram .WFC > rect,
+  #mermaid-diagram .WFC > polygon { fill: #E8F8F5 !important; stroke: #66BB6A !important; }
+
+  .legend-row {
+    display: flex;
+    gap: 24px;
+    padding: 14px 28px;
+    background: #F8F9FA;
+    border-bottom: 1px solid #EBECF0;
+    font-size: 12px;
+    color: #6B778C;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .leg { display: flex; align-items: center; gap: 6px; }
+  .leg-line {
+    width: 32px; height: 2px; background: #8993A4;
+    position: relative; display: inline-block;
+  }
+  .leg-line::after {
+    content: ''; position: absolute; right: -1px; top: -4px;
+    border: 5px solid transparent; border-left: 7px solid #8993A4;
+  }
+  .leg-dash {
+    width: 32px; height: 0; border-top: 2px dashed #8993A4;
+    position: relative; display: inline-block;
+  }
+  .leg-dash::after {
+    content: ''; position: absolute; right: -1px; top: -4px;
+    border: 5px solid transparent; border-left: 7px solid #8993A4;
+  }
+  .pill {
+    background: #172B4D; color: white; font-size: 10px; font-weight: 700;
+    padding: 2px 8px; border-radius: 8px;
+  }
+
+  /* ── Table ── */
+  .rules-wrap { padding: 0 28px 28px; }
+  .rules-label {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .5px; color: #6B778C; padding: 18px 0 10px;
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  th {
+    background: #F4F5F7; text-align: left; padding: 9px 14px;
+    font-size: 11px; font-weight: 700; color: #6B778C;
+    text-transform: uppercase; letter-spacing: .4px;
+    border-bottom: 1.5px solid #DFE1E6;
+  }
+  td { padding: 10px 14px; border-bottom: 1px solid #F4F5F7; vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #FAFBFC; }
+  .sp { display:inline-block; padding:2px 8px; border-radius:3px; font-size:11px; font-weight:700; }
+  .sw { background:#DEEBFF; color:#0052CC; }
+  .sa { background:#EAE6FF; color:#403294; }
+  .sh { background:#FFF0B3; color:#7A5800; }
+  .sr { background:#E3FCEF; color:#006644; }
+  .sc { background:#EBECF0; color:#42526E; }
+  .sx { background:#FFEBE6; color:#BF2600; }
+  .trigger { color:#FF5630; font-weight:600; }
+</style>
+</head>
+<body>
+
+<div class="card">
+
+  <!-- HEADER -->
+  <div class="card-header">
+    <h2>ISSD Workflow Change Request — ITSRV-2876</h2>
+    <p>Add missing statuses + 7 automation rules — mirrors ITH board. Targeted to GWS ticket types only.</p>
+    <div class="tags">
+      <span class="tag tg">Google Case Request</span>
+      <span class="tag ta">Automate Workflow</span>
+      <span class="tag tb">Atlassian admin: Doğukan Öntürk</span>
+    </div>
+  </div>
+
+  <!-- DIAGRAM -->
+  <div class="diagram-area">
+    <div class="mermaid">
+flowchart LR
+
+  START(["● START"]):::startStyle --> OPEN["OPEN"]
+  OPEN --> IP["IN PROGRESS"]
+
+  IP --> WFC["WAITING FOR\nCUSTOMER"]:::wfcStyle
+  WFC -. "↩ customer replies" .-> IP
+  WFC -- "⚡ Day 10 auto" --> RES
+
+  IP --> WFA["WAITING FOR\nAPPROVAL"]:::wfaStyle
+  WFA -. "↩ approved" .-> IP
+  WFA -- "⚡ Day 13 auto" --> CAN
+
+  IP --> OH["ON HOLD"]:::holdStyle
+  OH -. "⚡ due date\nauto-resume" .-> IP
+
+  IP --> CAN["CANCELLED"]:::canStyle
+
+  IP --> RES["RESOLVED"]:::resStyle
+  RES -- "⚡ Day 7 auto" --> CLO["CLOSED"]:::clsStyle
+
+  classDef startStyle fill:#172B4D,color:#FFFFFF,stroke:#172B4D,font-weight:bold
+  classDef wfcStyle   fill:#E8F8F5,color:#1B5E20,stroke:#66BB6A,font-weight:bold
+  classDef wfaStyle   fill:#EDE7F6,color:#4527A0,stroke:#9575CD,font-weight:bold
+  classDef holdStyle  fill:#FFFDE7,color:#7A5800,stroke:#F9A825,font-weight:bold
+  classDef canStyle   fill:#FFEBEE,color:#B71C1C,stroke:#EF9A9A,font-weight:bold
+  classDef resStyle   fill:#E8F5E9,color:#1B5E20,stroke:#66BB6A,font-weight:bold
+  classDef clsStyle   fill:#E8F5E9,color:#2E7D32,stroke:#A5D6A7,font-weight:bold
+    </div>
+  </div>
+
+  <!-- LEGEND -->
+  <div class="legend-row">
+    <div class="leg"><span class="leg-line"></span> Manual transition</div>
+    <div class="leg"><span class="leg-dash"></span> Customer / agent returns to In Progress</div>
+    <div class="leg"><span class="pill">⚡ Day N auto</span>&nbsp; Automation fires on label arrow</div>
+    <div class="leg" style="margin-left:auto;color:#42526E;">
+      Requires internet to render (Mermaid CDN)
+    </div>
+  </div>
+
+  <!-- TABLE -->
+  <div class="rules-wrap">
+    <div class="rules-label">7 Automation Rules — both Google Case Request &amp; Automate Workflow</div>
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Status</th>
+          <th>Trigger</th>
+          <th>Action</th>
+          <th>ITH parity</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td><span class="sp sw">Waiting for Customer</span></td>
+          <td class="trigger">5 days — no reply</td>
+          <td>Post public comment: automated reminder to customer</td>
+          <td>✅ Exists in ITH</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td><span class="sp sw">Waiting for Customer</span></td>
+          <td class="trigger">10 days — no reply</td>
+          <td>Auto-transition → <span class="sp sr">Resolved</span> · post public comment</td>
+          <td>✅ Exists in ITH</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td><span class="sp sa">Waiting for Approval</span></td>
+          <td class="trigger">3 days — no approval</td>
+          <td>Post reminder comment to approver</td>
+          <td>✅ Exists in ITH</td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td><span class="sp sa">Waiting for Approval</span></td>
+          <td class="trigger">10 days — no approval</td>
+          <td>Post escalation warning comment</td>
+          <td>✅ Exists in ITH</td>
+        </tr>
+        <tr>
+          <td>5</td>
+          <td><span class="sp sa">Waiting for Approval</span></td>
+          <td class="trigger">13 days — no approval</td>
+          <td>Auto-transition → <span class="sp sx">Cancelled</span> · post public comment</td>
+          <td>✅ Exists in ITH</td>
+        </tr>
+        <tr>
+          <td>6</td>
+          <td><span class="sp sh">On Hold</span></td>
+          <td class="trigger">Due date reached</td>
+          <td>Auto-transition → <span class="sp sw">In Progress</span> · internal comment</td>
+          <td>✅ Exists in ITH</td>
+        </tr>
+        <tr>
+          <td>7</td>
+          <td><span class="sp sr">Resolved</span></td>
+          <td class="trigger">7 days since resolution</td>
+          <td>Auto-transition → <span class="sp sc">Closed</span></td>
+          <td>✅ Exists in ITH</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div><!-- end card -->
+
+</body>
+</html>
