@@ -2,7 +2,7 @@ name: Refresh Ticket Data
 
 on:
   schedule:
-    # Hourly at :05 past every hour.
+    # Hourly at :05 past every hour. Scheduler re-registered: 2026-08-28.
     - cron: "5 * * * *"
   workflow_dispatch:
 
