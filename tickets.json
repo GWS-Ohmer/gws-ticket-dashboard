@@ -1,9 +1,29 @@
 {
-  "fetched_at": "2026-08-28T10:18:29.180574+00:00",
+  "fetched_at": "2026-08-28T12:12:36.183035+00:00",
   "year": 2026,
   "jql": "project = \"ITH\" AND component = \"Google\" AND created >= \"2026-01-01\" ORDER BY created DESC",
-  "total_fetched": 2080,
+  "total_fetched": 2081,
   "tickets": [
+    {
+      "key": "ITH-268009",
+      "url": "https://hellofresh.atlassian.net/browse/ITH-268009",
+      "summary": "No emails coming through in inbox",
+      "status": "Open Help Desk",
+      "status_category_key": "new",
+      "level": "L1",
+      "is_automated": false,
+      "assignee_name": "Unassigned",
+      "assignee_email": "",
+      "reporter_name": "Isabella Domenig",
+      "created": "2026-08-28T14:05:49.983+0200",
+      "updated": "2026-08-28T14:06:03.454+0200",
+      "resolutiondate": null,
+      "priority": "Normal",
+      "issuetype": "Service Request",
+      "resolution": null,
+      "request_type": "GWS Resource Request",
+      "request_type_id": "2987"
+    },
     {
       "key": "ITH-267948",
       "url": "https://hellofresh.atlassian.net/browse/ITH-267948",
