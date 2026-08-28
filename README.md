@@ -62,3 +62,4 @@ The dashboard reads `tickets.json` on load and auto-reloads every 5 minutes clie
 
 **L0 = Automated** (handled by IT Bot, no human touch)  
 **L1/L2/L3 = Manual** (human-handled)
+<!-- scheduler-kick: 2026-08-28 12:11 UTC -->
