@@ -1,8 +1,8 @@
 {
-  "fetched_at": "2026-09-02T18:37:30.611940+00:00",
+  "fetched_at": "2026-09-02T21:46:51.866116+00:00",
   "year": 2026,
   "jql": "project = \"ITH\" AND component = \"Google\" AND created >= \"2026-01-01\" ORDER BY created DESC",
-  "total_fetched": 2130,
+  "total_fetched": 2131,
   "tickets": [
     {
       "key": "ITH-268932",
@@ -23,6 +23,26 @@
       "resolution": null,
       "request_type": "GWS Support Request",
       "request_type_id": "2989"
+    },
+    {
+      "key": "ITH-268910",
+      "url": "https://hellofresh.atlassian.net/browse/ITH-268910",
+      "summary": "move gdrive files from deactivated user",
+      "status": "Open L2 GWS Support",
+      "status_category_key": "new",
+      "level": "L2",
+      "is_automated": false,
+      "assignee_name": "Unassigned",
+      "assignee_email": "",
+      "reporter_name": "Bart Molenda",
+      "created": "2026-09-02T17:52:23.966+0200",
+      "updated": "2026-09-02T20:50:01.509+0200",
+      "resolutiondate": null,
+      "priority": "Normal",
+      "issuetype": "Service Request",
+      "resolution": null,
+      "request_type": "General IT Request",
+      "request_type_id": "882"
     },
     {
       "key": "ITH-268895",
