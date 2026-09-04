@@ -1,9 +1,29 @@
 {
-  "fetched_at": "2026-09-04T19:29:35.048737+00:00",
+  "fetched_at": "2026-09-04T22:20:20.260512+00:00",
   "year": 2026,
   "jql": "project = \"ITH\" AND component = \"Google\" AND created >= \"2026-01-01\" ORDER BY created DESC",
-  "total_fetched": 2149,
+  "total_fetched": 2150,
   "tickets": [
+    {
+      "key": "ITH-269436",
+      "url": "https://hellofresh.atlassian.net/browse/ITH-269436",
+      "summary": "Request to create a distribution list",
+      "status": "Resolved",
+      "status_category_key": "done",
+      "level": "L0",
+      "is_automated": true,
+      "assignee_name": "IT Bot",
+      "assignee_email": "it-accounts+jirabot@hellofresh.com",
+      "reporter_name": "Emjielyn Groenestein",
+      "created": "2026-09-04T21:48:22.954+0200",
+      "updated": "2026-09-04T21:50:12.224+0200",
+      "resolutiondate": "2026-09-04T21:48:43.300+0200",
+      "priority": "Low",
+      "issuetype": "Service Request",
+      "resolution": "Resolved",
+      "request_type": "GWS Resource Request",
+      "request_type_id": "2987"
+    },
     {
       "key": "ITH-269411",
       "url": "https://hellofresh.atlassian.net/browse/ITH-269411",
