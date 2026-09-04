@@ -1,9 +1,29 @@
 {
-  "fetched_at": "2026-09-04T16:18:00.963116+00:00",
+  "fetched_at": "2026-09-04T19:29:35.048737+00:00",
   "year": 2026,
   "jql": "project = \"ITH\" AND component = \"Google\" AND created >= \"2026-01-01\" ORDER BY created DESC",
-  "total_fetched": 2148,
+  "total_fetched": 2149,
   "tickets": [
+    {
+      "key": "ITH-269411",
+      "url": "https://hellofresh.atlassian.net/browse/ITH-269411",
+      "summary": "Is it possible to create a Google enterprise account on my phone? ",
+      "status": "Open Help Desk",
+      "status_category_key": "new",
+      "level": "L2",
+      "is_automated": false,
+      "assignee_name": "Unassigned",
+      "assignee_email": "",
+      "reporter_name": "Roshan Patel",
+      "created": "2026-09-04T18:23:48.239+0200",
+      "updated": "2026-09-04T18:23:58.052+0200",
+      "resolutiondate": null,
+      "priority": "Low",
+      "issuetype": "Service Request",
+      "resolution": null,
+      "request_type": "GWS Resource Request",
+      "request_type_id": "2987"
+    },
     {
       "key": "ITH-269379",
       "url": "https://hellofresh.atlassian.net/browse/ITH-269379",
