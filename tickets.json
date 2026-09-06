@@ -1,9 +1,29 @@
 {
-  "fetched_at": "2026-09-06T09:21:51.059141+00:00",
+  "fetched_at": "2026-09-06T13:38:29.645222+00:00",
   "year": 2026,
   "jql": "project = \"ITH\" AND component = \"Google\" AND created >= \"2026-01-01\" ORDER BY created DESC",
-  "total_fetched": 2150,
+  "total_fetched": 2151,
   "tickets": [
+    {
+      "key": "ITH-269471",
+      "url": "https://hellofresh.atlassian.net/browse/ITH-269471",
+      "summary": "Gsheet Concern",
+      "status": "Resolved",
+      "status_category_key": "done",
+      "level": "L2",
+      "is_automated": false,
+      "assignee_name": "Matroll Lamalama",
+      "assignee_email": "matroll.lamalama@helloconnect.org",
+      "reporter_name": "Lee Ann Delegero",
+      "created": "2026-09-06T12:16:43.712+0200",
+      "updated": "2026-09-06T13:22:01.698+0200",
+      "resolutiondate": "2026-09-06T13:22:01.559+0200",
+      "priority": "Normal",
+      "issuetype": "Service Request",
+      "resolution": "Resolved",
+      "request_type": "GWS Support Request",
+      "request_type_id": "2989"
+    },
     {
       "key": "ITH-269436",
       "url": "https://hellofresh.atlassian.net/browse/ITH-269436",
