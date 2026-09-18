@@ -1,9 +1,29 @@
 {
-  "fetched_at": "2026-09-17T23:31:45.913245+00:00",
+  "fetched_at": "2026-09-18T04:35:40.053409+00:00",
   "year": 2026,
   "jql": "project = \"ITH\" AND component = \"Google\" AND created >= \"2026-01-01\" ORDER BY created DESC",
-  "total_fetched": 2247,
+  "total_fetched": 2248,
   "tickets": [
+    {
+      "key": "ITH-271645",
+      "url": "https://hellofresh.atlassian.net/browse/ITH-271645",
+      "summary": "Access to a google sheet with previous owner left the organization",
+      "status": "Open L2 GWS Support",
+      "status_category_key": "new",
+      "level": "L2",
+      "is_automated": false,
+      "assignee_name": "Unassigned",
+      "assignee_email": "",
+      "reporter_name": "Timothy Guo",
+      "created": "2026-09-18T03:50:51.922+0200",
+      "updated": "2026-09-18T04:23:28.888+0200",
+      "resolutiondate": null,
+      "priority": "Normal",
+      "issuetype": "Service Request",
+      "resolution": null,
+      "request_type": "General IT Request",
+      "request_type_id": "882"
+    },
     {
       "key": "ITH-271584",
       "url": "https://hellofresh.atlassian.net/browse/ITH-271584",
