@@ -1,9 +1,29 @@
 {
-  "fetched_at": "2026-09-25T18:31:56.583003+00:00",
+  "fetched_at": "2026-09-25T22:15:43.226577+00:00",
   "year": 2026,
   "jql": "project = \"ITH\" AND component = \"Google\" AND created >= \"2026-01-01\" ORDER BY created DESC",
-  "total_fetched": 2301,
+  "total_fetched": 2302,
   "tickets": [
+    {
+      "key": "ITH-272924",
+      "url": "https://hellofresh.atlassian.net/browse/ITH-272924",
+      "summary": "cant log in to my google email account im getting a error message saying they cant verify its me",
+      "status": "Open Help Desk",
+      "status_category_key": "new",
+      "level": "L2",
+      "is_automated": false,
+      "assignee_name": "Unassigned",
+      "assignee_email": "",
+      "reporter_name": "Parish Burgess",
+      "created": "2026-09-25T22:17:26.666+0200",
+      "updated": "2026-09-25T22:17:35.336+0200",
+      "resolutiondate": null,
+      "priority": "Normal",
+      "issuetype": "Service Request",
+      "resolution": null,
+      "request_type": "GWS Support Request",
+      "request_type_id": "2989"
+    },
     {
       "key": "ITH-272838",
       "url": "https://hellofresh.atlassian.net/browse/ITH-272838",
