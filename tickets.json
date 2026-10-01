@@ -1,5 +1,5 @@
 {
-  "fetched_at": "2026-09-30T22:59:30.439100+00:00",
+  "fetched_at": "2026-10-01T02:04:27.912095+00:00",
   "year": 2026,
   "jql": "project = \"ITH\" AND component = \"Google\" AND created >= \"2026-01-01\" ORDER BY created DESC",
   "total_fetched": 2335,
@@ -1176,7 +1176,7 @@
       "assignee_email": "jazmin.lucero@helloconnect.org",
       "reporter_name": "Allie Martinez",
       "created": "2026-09-23T01:01:58.934+0200",
-      "updated": "2026-10-01T00:49:51.376+0200",
+      "updated": "2026-10-01T02:49:40.329+0200",
       "resolutiondate": null,
       "priority": "High",
       "issuetype": "Service Request",
