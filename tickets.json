@@ -1,5 +1,5 @@
 {
-  "fetched_at": "2026-10-03T06:24:59.228779+00:00",
+  "fetched_at": "2026-10-03T12:28:43.215740+00:00",
   "year": 2026,
   "jql": "project = \"ITH\" AND component = \"Google\" AND created >= \"2026-01-01\" ORDER BY created DESC",
   "total_fetched": 2356,
@@ -376,7 +376,7 @@
       "assignee_email": "patrizia.dona@hellofresh.com",
       "reporter_name": "Elliott Weideman",
       "created": "2026-10-01T14:40:58.424+0200",
-      "updated": "2026-10-01T16:10:38.664+0200",
+      "updated": "2026-10-03T09:01:01.105+0200",
       "resolutiondate": null,
       "priority": "Normal",
       "issuetype": "Service Request",
