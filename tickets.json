@@ -1,5 +1,5 @@
 {
-  "fetched_at": "2026-10-02T20:40:37.453321+00:00",
+  "fetched_at": "2026-10-03T00:25:32.627443+00:00",
   "year": 2026,
   "jql": "project = \"ITH\" AND component = \"Google\" AND created >= \"2026-01-01\" ORDER BY created DESC",
   "total_fetched": 2356,
@@ -36,7 +36,7 @@
       "assignee_email": "it-accounts+jirabot@hellofresh.com",
       "reporter_name": "Kari Shearer",
       "created": "2026-10-02T21:42:13.438+0200",
-      "updated": "2026-10-02T21:42:36.248+0200",
+      "updated": "2026-10-02T23:34:10.722+0200",
       "resolutiondate": "2026-10-02T21:42:36.221+0200",
       "priority": "Low",
       "issuetype": "Service Request",
