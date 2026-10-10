@@ -1,5 +1,5 @@
 {
-  "fetched_at": "2026-10-09T21:38:09.913952+00:00",
+  "fetched_at": "2026-10-10T01:43:36.467442+00:00",
   "year": 2026,
   "jql": "project = \"ITH\" AND component = \"Google\" AND created >= \"2026-01-01\" ORDER BY created DESC",
   "total_fetched": 2398,
