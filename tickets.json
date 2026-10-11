@@ -1,9 +1,29 @@
 {
-  "fetched_at": "2026-10-11T12:41:28.196014+00:00",
+  "fetched_at": "2026-10-11T18:01:57.001663+00:00",
   "year": 2026,
   "jql": "project = \"ITH\" AND component = \"Google\" AND created >= \"2026-01-01\" ORDER BY created DESC",
-  "total_fetched": 2398,
+  "total_fetched": 2399,
   "tickets": [
+    {
+      "key": "ITH-275291",
+      "url": "https://hellofresh.atlassian.net/browse/ITH-275291",
+      "summary": "I need a shared folder in Google Drive. The cooking instructions should be organized",
+      "status": "Open Help Desk",
+      "status_category_key": "new",
+      "level": "L2",
+      "is_automated": false,
+      "assignee_name": "Unassigned",
+      "assignee_email": "",
+      "reporter_name": "Marcel Spindler",
+      "created": "2026-10-11T19:11:02.936+0200",
+      "updated": "2026-10-11T19:11:44.443+0200",
+      "resolutiondate": null,
+      "priority": "Normal",
+      "issuetype": "Service Request",
+      "resolution": null,
+      "request_type": "GWS Resource Request",
+      "request_type_id": "2987"
+    },
     {
       "key": "ITH-275226",
       "url": "https://hellofresh.atlassian.net/browse/ITH-275226",
