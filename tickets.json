@@ -1,9 +1,29 @@
 {
-  "fetched_at": "2026-10-17T22:14:18.890408+00:00",
+  "fetched_at": "2026-10-18T00:57:03.624896+00:00",
   "year": 2026,
   "jql": "project = \"ITH\" AND component = \"Google\" AND created >= \"2026-01-01\" ORDER BY created DESC",
-  "total_fetched": 2433,
+  "total_fetched": 2434,
   "tickets": [
+    {
+      "key": "ITH-276421",
+      "url": "https://hellofresh.atlassian.net/browse/ITH-276421",
+      "summary": "Assistance in Retaining Email and Google Drive Files of Offboarded Employee Gianpaolo Vergonia",
+      "status": "Open Help Desk",
+      "status_category_key": "new",
+      "level": "L2",
+      "is_automated": false,
+      "assignee_name": "Unassigned",
+      "assignee_email": "",
+      "reporter_name": "Carlo Gasparri",
+      "created": "2026-10-18T01:28:23.217+0200",
+      "updated": "2026-10-18T01:31:46.630+0200",
+      "resolutiondate": null,
+      "priority": "Normal",
+      "issuetype": "Service Request",
+      "resolution": null,
+      "request_type": "GWS Support Request",
+      "request_type_id": "2989"
+    },
     {
       "key": "ITH-276372",
       "url": "https://hellofresh.atlassian.net/browse/ITH-276372",
