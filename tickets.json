@@ -1,9 +1,29 @@
 {
-  "fetched_at": "2026-10-18T18:02:50.426986+00:00",
+  "fetched_at": "2026-10-18T20:36:23.968035+00:00",
   "year": 2026,
   "jql": "project = \"ITH\" AND component = \"Google\" AND created >= \"2026-01-01\" ORDER BY created DESC",
-  "total_fetched": 2434,
+  "total_fetched": 2435,
   "tickets": [
+    {
+      "key": "ITH-276448",
+      "url": "https://hellofresh.atlassian.net/browse/ITH-276448",
+      "summary": "Test",
+      "status": "Resolved",
+      "status_category_key": "done",
+      "level": "L1",
+      "is_automated": false,
+      "assignee_name": "Unassigned",
+      "assignee_email": "",
+      "reporter_name": "Patricia Dawn San Diego",
+      "created": "2026-10-18T20:08:11.688+0200",
+      "updated": "2026-10-18T20:08:49.805+0200",
+      "resolutiondate": "2026-10-18T20:08:46.902+0200",
+      "priority": "Low",
+      "issuetype": "Service Request",
+      "resolution": "Resolved",
+      "request_type": "GCP Requests",
+      "request_type_id": "3051"
+    },
     {
       "key": "ITH-276421",
       "url": "https://hellofresh.atlassian.net/browse/ITH-276421",
