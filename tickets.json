@@ -1,9 +1,29 @@
 {
-  "fetched_at": "2026-11-01T07:28:48.306556+00:00",
+  "fetched_at": "2026-11-01T15:00:26.538868+00:00",
   "year": 2026,
   "jql": "project = \"ITH\" AND component = \"Google\" AND created >= \"2026-01-01\" ORDER BY created DESC",
-  "total_fetched": 2519,
+  "total_fetched": 2520,
   "tickets": [
+    {
+      "key": "ITH-278538",
+      "url": "https://hellofresh.atlassian.net/browse/ITH-278538",
+      "summary": "Previous Manager has left the business and not transferred ownership of a G-Sheet",
+      "status": "Open Help Desk",
+      "status_category_key": "new",
+      "level": "L2",
+      "is_automated": false,
+      "assignee_name": "Unassigned",
+      "assignee_email": "",
+      "reporter_name": "Jack Rogers",
+      "created": "2026-11-01T15:03:00.704+0100",
+      "updated": "2026-11-01T15:03:09.052+0100",
+      "resolutiondate": null,
+      "priority": "Normal",
+      "issuetype": "Service Request",
+      "resolution": null,
+      "request_type": "GWS Support Request",
+      "request_type_id": "2989"
+    },
     {
       "key": "ITH-278492",
       "url": "https://hellofresh.atlassian.net/browse/ITH-278492",
