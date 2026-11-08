@@ -1,5 +1,5 @@
 {
-  "fetched_at": "2026-11-08T15:04:21.018153+00:00",
+  "fetched_at": "2026-11-08T19:38:56.651572+00:00",
   "year": 2026,
   "jql": "project = \"ITH\" AND component = \"Google\" AND created >= \"2026-01-01\" ORDER BY created DESC",
   "total_fetched": 2574,
@@ -416,7 +416,7 @@
       "assignee_email": "ohmer.sulit@helloconnect.org",
       "reporter_name": "Albert Liu",
       "created": "2026-11-04T18:08:32.163+0100",
-      "updated": "2026-11-07T09:00:59.184+0100",
+      "updated": "2026-11-08T17:24:00.748+0100",
       "resolutiondate": null,
       "priority": "Low",
       "issuetype": "Service Request",
