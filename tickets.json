@@ -1,5 +1,5 @@
 {
-  "fetched_at": "2026-11-15T02:35:13.433384+00:00",
+  "fetched_at": "2026-11-15T10:43:34.287152+00:00",
   "year": 2026,
   "jql": "project = \"ITH\" AND component = \"Google\" AND created >= \"2026-01-01\" ORDER BY created DESC",
   "total_fetched": 2620,
@@ -56,7 +56,7 @@
       "assignee_email": "ohmer.sulit@helloconnect.org",
       "reporter_name": "Codey Friedrich-Goodall",
       "created": "2026-11-13T17:34:46.817+0100",
-      "updated": "2026-11-13T18:25:11.201+0100",
+      "updated": "2026-11-15T09:01:00.142+0100",
       "resolutiondate": null,
       "priority": "Low",
       "issuetype": "Service Request",
