@@ -1,5 +1,5 @@
 {
-  "fetched_at": "2026-11-21T09:40:11.612070+00:00",
+  "fetched_at": "2026-11-21T17:24:40.541474+00:00",
   "year": 2026,
   "jql": "project = \"ITH\" AND component = \"Google\" AND created >= \"2026-01-01\" ORDER BY created DESC",
   "total_fetched": 2674,
@@ -16,7 +16,7 @@
       "assignee_email": "",
       "reporter_name": "Laura Ricchiardi",
       "created": "2026-11-20T18:48:40.757+0100",
-      "updated": "2026-11-21T04:57:24.491+0100",
+      "updated": "2026-11-21T13:42:52.922+0100",
       "resolutiondate": null,
       "priority": "Normal",
       "issuetype": "Service Request",
